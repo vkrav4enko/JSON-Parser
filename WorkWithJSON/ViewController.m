@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "ParseJSON.h"
+#import "Annotation.h"
 @interface ViewController ()
 
 
@@ -22,21 +23,12 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    _timer = [NSTimer scheduledTimerWithTimeInterval:60.0f
-                                              target:self
-                                            selector:@selector(tick)
-                                            userInfo:nil
-                                             repeats:YES];
-    
-  
     _locationManager = [CLLocationManager new];
     _locationManager.delegate = self;
     [_locationManager startUpdatingLocation];
     [_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:1.0f];
 
-    
-    _mapView.showsUserLocation = YES;
-    [_mapView setUserTrackingMode:MKUserTrackingModeFollow animated:YES];
+    _mapView.showsUserLocation = NO;
     
     UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] initWithItems:
                                             [NSArray arrayWithObjects:
@@ -45,22 +37,14 @@
                                              @"Hybrid",
                                              nil]];
     [segmentedControl addTarget:self action:@selector(changeMapType:) forControlEvents:UIControlEventValueChanged];
-    segmentedControl.frame = CGRectMake(55.0f, 120.0f, 200.0f, 30.0f);
+    segmentedControl.frame = CGRectMake(0.0f, 43.0f, 200.0f, 30.0f);
     segmentedControl.selectedSegmentIndex = 0;
     segmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
     
     [self.view addSubview:segmentedControl];
     
-    
-   
-    
-//    
-//    ParseJSON *parser = [[ParseJSON alloc] initWithString:[NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil]];
-//    
-//    
-//    id obj = [parser parse];
-//    NSLog(@"%@", obj);
 
+    [_mapView addAnnotation:[_mapView userLocation]];
 }
 
 - (void)didReceiveMemoryWarning
@@ -71,9 +55,6 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
-    
-    
-    
     NSString *strURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f", newLocation.coordinate.latitude, newLocation.coordinate.longitude];
     
     NSString *weather  = [NSString stringWithContentsOfURL:[NSURL URLWithString:strURL] encoding:NSUTF8StringEncoding error:nil];
@@ -82,12 +63,18 @@
     id obj = [parser parse];
     NSLog(@"%@", obj);
     
-    if ([obj isKindOfClass: [NSDictionary class]])
-    {
-        _textField.text = [NSString stringWithFormat:@"City: %@ \nCountry: %@ \nTemperature: %@ \nPressure: %@ \nWind: %@", [obj objectForKey:@"name"], [[obj objectForKey:@"sys"] objectForKey:@"country"], [[obj objectForKey:@"main"] objectForKey:@"temp"], [[obj objectForKey:@"main"] objectForKey:@"pressure"], [[obj objectForKey:@"wind"] objectForKey:@"speed"] ];
-    }
-  
-    
+    Annotation *annotation = [Annotation new];
+    annotation.title = @"Current location";
+    annotation.subtitle = [NSString stringWithFormat:@"Temperature = %@", [[obj objectForKey:@"main"] objectForKey:@"temp"]];
+    annotation.coordinate = CLLocationCoordinate2DMake(newLocation.coordinate.latitude, newLocation.coordinate.longitude);
+    [_mapView addAnnotation:annotation];
+    [self openAnnotation:annotation];
+    MKCoordinateRegion region = self.mapView.region;
+    region.center = CLLocationCoordinate2DMake(newLocation.coordinate.latitude, newLocation.coordinate.longitude);
+    region.span.longitudeDelta /= 2; // Bigger the value, closer the map view
+    region.span.latitudeDelta /= 2;
+    [self.mapView setRegion:region animated:YES];
+
 }
 
 - (void)changeMapType:(UISegmentedControl*)sender {
@@ -100,14 +87,74 @@
     }
 }
 
-- (void) tick
+
+
+- (MKAnnotationView *) mapView:(MKMapView *)map viewForAnnotation:(id <MKAnnotation>)annotation
 {
-    NSLog(@"time tick");
+    static NSString *pinID = @"mapPin";
+    MKAnnotationView *pinAnnotation = nil;
+    pinAnnotation = (MKAnnotationView *)[_mapView dequeueReusableAnnotationViewWithIdentifier:pinID];
+    if (pinAnnotation == nil)
+        pinAnnotation = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:pinID] ;
     
-    [_locationManager startUpdatingLocation];
-    [_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:1.0f];
+    pinAnnotation.canShowCallout = YES;
+    return pinAnnotation;
+    
+
+}
+
+- (void)openAnnotation:(id)annotation;
+{
+    [_mapView selectAnnotation:annotation animated:YES];
+    
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    Annotation *annotation = [Annotation new];
+    annotation.title = textField.text;
     
     
+    NSString *cityName = [NSString stringWithString:textField.text];
+    NSString *strURL = [NSString stringWithFormat:@"http://maps.google.com/maps/api/geocode/json?address=%@&sensor=true", cityName];
+    NSString *geocode  = [NSString stringWithContentsOfURL:[NSURL URLWithString:strURL] encoding:NSUTF8StringEncoding error:nil];
+    ParseJSON *parcer = [[ParseJSON alloc] initWithString:geocode];
+    id obj = [parcer parse];
+    NSLog(@"%@", obj);
+    
+    NSNumber *number = [[[[[obj objectForKey: @"results"] objectAtIndex:0] objectForKey:@"geometry"] objectForKey:@"location"] objectForKey:@"lat"] ;
+    float lat = [number floatValue];
+    number = [[[[[obj objectForKey: @"results"] objectAtIndex:0] objectForKey:@"geometry"] objectForKey:@"location"] objectForKey:@"lng"] ;
+    float lng = [number floatValue];
+    
+    strURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f", lat, lng];
+    
+    NSString *weather  = [NSString stringWithContentsOfURL:[NSURL URLWithString:strURL] encoding:NSUTF8StringEncoding error:nil];
+    
+    ParseJSON *parser2 = [[ParseJSON alloc] initWithString:weather];
+    id obj2 = [parser2 parse];
+    annotation.subtitle = [NSString stringWithFormat:@"temperature = %@", [[obj2 objectForKey:@"main"] objectForKey:@"temp"]];
+    
+    NSLog(@"lat = %f, lng = %f", lat, lng);
+    
+    annotation.coordinate = CLLocationCoordinate2DMake(lat, lng);
+    [_mapView addAnnotation:annotation];
+    
+    MKCoordinateRegion region = self.mapView.region;
+    region.center = CLLocationCoordinate2DMake(lat, lng);
+    region.span.longitudeDelta /= 2; // Bigger the value, closer the map view
+    region.span.latitudeDelta /= 2;
+    [self.mapView setRegion:region animated:YES];
+    [self.view endEditing:YES];
+    [self openAnnotation:annotation];
+    return YES;
+
+}
+
+-(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    textField.text = @"";
+    return YES;
 }
 
 @end
