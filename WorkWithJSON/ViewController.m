@@ -10,7 +10,7 @@
 #import "ParseJSON.h"
 @interface ViewController ()
 
-@property (nonatomic, copy) NSString *strURL;
+
 @property (nonatomic, strong) NSTimer *timer;
 
 @end
@@ -35,6 +35,22 @@
     [_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:1.0f];
 
     
+    _mapView.showsUserLocation = YES;
+    [_mapView setUserTrackingMode:MKUserTrackingModeFollow animated:YES];
+    
+    UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] initWithItems:
+                                            [NSArray arrayWithObjects:
+                                             @"Map",
+                                             @"Satellite",
+                                             @"Hybrid",
+                                             nil]];
+    [segmentedControl addTarget:self action:@selector(changeMapType:) forControlEvents:UIControlEventValueChanged];
+    segmentedControl.frame = CGRectMake(55.0f, 120.0f, 200.0f, 30.0f);
+    segmentedControl.selectedSegmentIndex = 0;
+    segmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
+    
+    [self.view addSubview:segmentedControl];
+    
     
    
     
@@ -58,9 +74,9 @@
     
     
     
-    _strURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f", newLocation.coordinate.latitude, newLocation.coordinate.longitude];
+    NSString *strURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f", newLocation.coordinate.latitude, newLocation.coordinate.longitude];
     
-    NSString *weather  = [NSString stringWithContentsOfURL:[NSURL URLWithString:_strURL] encoding:NSUTF8StringEncoding error:nil];
+    NSString *weather  = [NSString stringWithContentsOfURL:[NSURL URLWithString:strURL] encoding:NSUTF8StringEncoding error:nil];
     
     ParseJSON *parser = [[ParseJSON alloc] initWithString:weather];
     id obj = [parser parse];
@@ -72,6 +88,16 @@
     }
   
     
+}
+
+- (void)changeMapType:(UISegmentedControl*)sender {
+    if (sender.selectedSegmentIndex == 0) {
+        _mapView.mapType = MKMapTypeStandard;
+    } else if (sender.selectedSegmentIndex == 1) {
+        _mapView.mapType = MKMapTypeSatellite;
+    } else if (sender.selectedSegmentIndex == 2) {
+        _mapView.mapType = MKMapTypeHybrid;
+    }
 }
 
 - (void) tick
