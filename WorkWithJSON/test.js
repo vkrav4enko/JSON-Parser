@@ -1,10 +1,2 @@
-
-
-[["ve", "Banana mama"  , ["Grape", 'Orange', 'test', { 'point':  4.23 }]],
-{
-    "id": 100,
-    "name": "Item #100",
-    "date_created": "01-02-2010 00:00:12"
-}]
-
+{"coord":{"lon":139,"lat":35},"sys":{"country":"JP","sunrise":1373225840,"sunset":1373277656},"weather":[{"id":800,"main":"Clear","description":"Sky is Clear","icon":"01n"}],"base":"global stations","main":{"temp":297.75,"humidity":79,"pressure":1016,"temp_min":294.26,"temp_max":300.93},"wind":{"speed":2.05,"deg":259.004},"clouds":{"all":0},"dt":1373297677,"id":1851632,"name":"Shuzenji","cod":200}
 

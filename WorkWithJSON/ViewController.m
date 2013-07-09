@@ -10,6 +10,9 @@
 #import "ParseJSON.h"
 @interface ViewController ()
 
+@property (nonatomic, copy) NSString *strURL;
+@property (nonatomic, strong) NSTimer *timer;
+
 @end
 
 @implementation ViewController
@@ -18,13 +21,29 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"test.js" ofType:nil];
-    ParseJSON *parser = [[ParseJSON alloc] initWithString:[NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil]];
     
-    //ParseJSON *parser = [[ParseJSON alloc] initWithString: @"{\"id\": 100, \"name\": \"Item #100\",\"date_created\": \"01-02-2010 00:00:12\"}"];
-    id obj = [parser parse];
-    NSLog(@"%@", obj);
+    _timer = [NSTimer scheduledTimerWithTimeInterval:60.0f
+                                              target:self
+                                            selector:@selector(tick)
+                                            userInfo:nil
+                                             repeats:YES];
     
+  
+    _locationManager = [CLLocationManager new];
+    _locationManager.delegate = self;
+    [_locationManager startUpdatingLocation];
+    [_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:1.0f];
+
+    
+    
+   
+    
+//    
+//    ParseJSON *parser = [[ParseJSON alloc] initWithString:[NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil]];
+//    
+//    
+//    id obj = [parser parse];
+//    NSLog(@"%@", obj);
 
 }
 
@@ -32,6 +51,37 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+{
+    
+    
+    
+    _strURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f", newLocation.coordinate.latitude, newLocation.coordinate.longitude];
+    
+    NSString *weather  = [NSString stringWithContentsOfURL:[NSURL URLWithString:_strURL] encoding:NSUTF8StringEncoding error:nil];
+    
+    ParseJSON *parser = [[ParseJSON alloc] initWithString:weather];
+    id obj = [parser parse];
+    NSLog(@"%@", obj);
+    
+    if ([obj isKindOfClass: [NSDictionary class]])
+    {
+        _textField.text = [NSString stringWithFormat:@"City: %@ \nCountry: %@ \nTemperature: %@ \nPressure: %@ \nWind: %@", [obj objectForKey:@"name"], [[obj objectForKey:@"sys"] objectForKey:@"country"], [[obj objectForKey:@"main"] objectForKey:@"temp"], [[obj objectForKey:@"main"] objectForKey:@"pressure"], [[obj objectForKey:@"wind"] objectForKey:@"speed"] ];
+    }
+  
+    
+}
+
+- (void) tick
+{
+    NSLog(@"time tick");
+    
+    [_locationManager startUpdatingLocation];
+    [_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:1.0f];
+    
+    
 }
 
 @end
