@@ -11,9 +11,10 @@
 #import "Annotation.h"
 #import "AppDelegate.h"
 #import "WeatherInfo.h"
+#import "NSManagedObject+ActiveRecord.h"
 
 @interface ViewController () <UIAlertViewDelegate>
-@property (nonatomic, strong) id parsedDictionary;
+
 
 @property (nonatomic, strong) NSTimer *timer;
 
@@ -82,7 +83,7 @@
     ParseJSON *parser = [[ParseJSON alloc] initWithString:weather];
     id obj = [parser parse];
     _parsedDictionary  = obj;
-    NSLog(@"%@", obj);
+    
     
     Annotation *annotation = [Annotation new];
     annotation.title = @"Current location";
@@ -112,16 +113,24 @@
     AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
     NSManagedObjectContext *context = appDelegate.managedObjectContext;
     WeatherInfo* newWeatherInfo = [NSEntityDescription insertNewObjectForEntityForName:@"WeatherInfo" inManagedObjectContext:context];
-    
     newWeatherInfo.city = [_parsedDictionary objectForKey:@"name"];
     newWeatherInfo.clouds = [NSString stringWithFormat:@"Clouds: %@%%",[[_parsedDictionary objectForKey:@"clouds"] objectForKey:@"all"]];
     newWeatherInfo.wind = [NSString stringWithFormat:@"Wind: %@ mps", [[_parsedDictionary objectForKey:@"wind"] objectForKey:@"speed"]];
     newWeatherInfo.humidity = [NSString stringWithFormat:@"Humidity: %@%%", [[_parsedDictionary objectForKey:@"main"] objectForKey:@"humidity"]];
     NSNumber *temperature = [[_parsedDictionary objectForKey:@"main"] objectForKey:@"temp"];    
     [NSString stringWithFormat:@"temperature = %.0f ºC", [temperature floatValue] - 273.15f];
-    newWeatherInfo.temperature = [NSString stringWithFormat:@"temperature = %.0f ºC", [temperature floatValue] - 273.15f];
+    newWeatherInfo.temperature = [NSString stringWithFormat:@"%.0f", [temperature floatValue] - 273.15f];
     newWeatherInfo.pressure = [NSString stringWithFormat:@"Pressure: %@hPa", [[_parsedDictionary objectForKey:@"main"] objectForKey:@"pressure"]];
     newWeatherInfo.timeStamp = [NSDate date];
+    
+    
+    NSString *filter = [NSString stringWithFormat:@"city like \"%@\"", [_parsedDictionary objectForKey:@"name"]];
+    NSArray *entities = [WeatherInfo findAllSortedBy:@"city" ascending:NO withPredicate:[NSPredicate predicateWithFormat:filter] inContext:context];
+    NSLog(@"%@", entities);
+    WeatherInfo *info = [entities objectAtIndex:0];
+    NSLog(@"%@", info.city);
+    
+
     
     NSError *error;
     if (![context save:&error]) {

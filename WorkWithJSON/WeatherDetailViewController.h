@@ -9,8 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "WeatherInfo.h"
 
-@interface WeatherDetailViewController : UIViewController
+@interface WeatherDetailViewController : UIViewController <CPTBarPlotDataSource, CPTBarPlotDelegate, CPTPlotDataSource>
 @property (nonatomic, strong) WeatherInfo *weatherInfo;
+@property (weak, nonatomic) IBOutlet CPTGraphHostingView *hostView;
+
 
 @property (weak, nonatomic) IBOutlet UILabel *city;
 @property (weak, nonatomic) IBOutlet UILabel *temp;

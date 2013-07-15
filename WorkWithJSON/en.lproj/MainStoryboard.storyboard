@@ -132,17 +132,23 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KuZ-PQ-Uwd" customClass="CPTGraphHostingView">
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="t0T-Od-iBD" firstAttribute="trailing" secondItem="6kg-Jc-xBk" secondAttribute="trailing" type="default" id="1Ht-aw-rg6"/>
-                            <constraint firstItem="5Ul-tk-IAl" firstAttribute="centerX" secondItem="Axy-WY-srQ" secondAttribute="centerX" type="default" id="70q-Cs-ie9"/>
+                            <constraint firstAttribute="bottom" secondItem="KuZ-PQ-Uwd" secondAttribute="bottom" constant="5" id="72Z-Gy-ABy"/>
                             <constraint firstItem="cHi-LF-iHv" firstAttribute="leading" secondItem="5Ul-tk-IAl" secondAttribute="leading" type="default" id="9EB-oi-zHb"/>
                             <constraint firstItem="cHi-LF-iHv" firstAttribute="trailing" secondItem="5Ul-tk-IAl" secondAttribute="trailing" type="default" id="DFu-sY-qyo"/>
                             <constraint firstItem="6kg-Jc-xBk" firstAttribute="leading" secondItem="cHi-LF-iHv" secondAttribute="leading" type="default" id="DPD-18-FKT"/>
+                            <constraint firstItem="5Ul-tk-IAl" firstAttribute="leading" secondItem="Axy-WY-srQ" secondAttribute="leading" constant="65" id="Dbb-je-njk"/>
                             <constraint firstItem="0VQ-Tz-gfh" firstAttribute="leading" secondItem="t0T-Od-iBD" secondAttribute="leading" type="default" id="DyK-1k-JYM"/>
+                            <constraint firstItem="KuZ-PQ-Uwd" firstAttribute="top" secondItem="Gtx-KM-ii9" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="UNh-TB-hAy"/>
                             <constraint firstItem="t0T-Od-iBD" firstAttribute="leading" secondItem="6kg-Jc-xBk" secondAttribute="leading" type="default" id="UUL-2e-xj1"/>
                             <constraint firstItem="t0T-Od-iBD" firstAttribute="top" secondItem="6kg-Jc-xBk" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="WBQ-g0-L4R"/>
+                            <constraint firstItem="KuZ-PQ-Uwd" firstAttribute="trailing" secondItem="Axy-WY-srQ" secondAttribute="trailing" type="default" id="Xiw-1G-qhd"/>
                             <constraint firstItem="Gtx-KM-ii9" firstAttribute="leading" secondItem="0VQ-Tz-gfh" secondAttribute="leading" type="default" id="br7-AA-gFg"/>
                             <constraint firstItem="cHi-LF-iHv" firstAttribute="top" secondItem="5Ul-tk-IAl" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="ePF-3y-CEC"/>
                             <constraint firstItem="6kg-Jc-xBk" firstAttribute="top" secondItem="cHi-LF-iHv" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="ecE-Cz-wNu"/>
@@ -150,14 +156,16 @@
                             <constraint firstItem="0VQ-Tz-gfh" firstAttribute="trailing" secondItem="t0T-Od-iBD" secondAttribute="trailing" type="default" id="jpF-Gb-kld"/>
                             <constraint firstItem="6kg-Jc-xBk" firstAttribute="trailing" secondItem="cHi-LF-iHv" secondAttribute="trailing" type="default" id="lfe-uB-TyX"/>
                             <constraint firstItem="0VQ-Tz-gfh" firstAttribute="top" secondItem="t0T-Od-iBD" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="rao-9e-uor"/>
-                            <constraint firstItem="5Ul-tk-IAl" firstAttribute="top" secondItem="Axy-WY-srQ" secondAttribute="top" constant="63" id="s0s-Ur-irk"/>
                             <constraint firstItem="Gtx-KM-ii9" firstAttribute="trailing" secondItem="0VQ-Tz-gfh" secondAttribute="trailing" type="default" id="xKm-Yi-hk1"/>
+                            <constraint firstItem="5Ul-tk-IAl" firstAttribute="top" secondItem="Axy-WY-srQ" secondAttribute="top" constant="26" id="yrC-CT-5af"/>
+                            <constraint firstItem="KuZ-PQ-Uwd" firstAttribute="leading" secondItem="Axy-WY-srQ" secondAttribute="leading" type="default" id="zsy-dk-1VG"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="TqS-kD-t8b"/>
                     <connections>
                         <outlet property="city" destination="5Ul-tk-IAl" id="0YF-aX-WNN"/>
                         <outlet property="cloud" destination="Gtx-KM-ii9" id="A1L-ac-swa"/>
+                        <outlet property="hostView" destination="KuZ-PQ-Uwd" id="hvg-wz-5wT"/>
                         <outlet property="humidity" destination="6kg-Jc-xBk" id="94i-WF-TcT"/>
                         <outlet property="presure" destination="0VQ-Tz-gfh" id="9Lo-aU-XXx"/>
                         <outlet property="temp" destination="cHi-LF-iHv" id="8eM-iv-7Ve"/>
@@ -188,7 +196,7 @@
         <scene sceneID="saw-2j-asL">
             <objects>
                 <tabBarController definesPresentationContext="YES" id="pjM-KG-u9k" sceneMemberID="viewController">
-                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <nil key="simulatedBottomBarMetrics"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" id="6mT-Be-usR">
                         <rect key="frame" x="129" y="330" width="163" height="49"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
@@ -204,6 +212,36 @@
             <point key="canvasLocation" x="-771" y="-390"/>
         </scene>
     </scenes>
+    <classes>
+        <class className="CPTGraphHostingView" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CPTGraphHostingView.h"/>
+        </class>
+        <class className="NSLayoutConstraint" superclassName="NSObject">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
+        </class>
+        <class className="ViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="mapView" candidateClass="MKMapView"/>
+                <relationship kind="outlet" name="textField" candidateClass="UITextView"/>
+            </relationships>
+        </class>
+        <class className="WeatherDetailViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WeatherDetailViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="city" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="cloud" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="hostView" candidateClass="CPTGraphHostingView"/>
+                <relationship kind="outlet" name="humidity" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="presure" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="temp" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="wind" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="WeatherInfoViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WeatherInfoViewController.h"/>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

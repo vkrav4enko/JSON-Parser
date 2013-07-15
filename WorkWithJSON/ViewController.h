@@ -16,5 +16,6 @@
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 @property (nonatomic, strong) CLLocationManager* locationManager;
 @property (weak, nonatomic) IBOutlet UITextView *textField;
+@property (nonatomic, strong) id parsedDictionary;
 
 @end

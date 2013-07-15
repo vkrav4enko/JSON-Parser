@@ -7,8 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "WeatherInfo.h"
 
 @interface WeatherInfoViewController : UITableViewController
 @property (nonatomic,strong) NSManagedObjectContext* managedObjectContext;
 @property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
+@property (nonatomic, strong) WeatherInfo *weatherInfo;
 @end
