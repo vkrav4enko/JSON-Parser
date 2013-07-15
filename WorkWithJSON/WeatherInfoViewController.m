@@ -31,6 +31,7 @@
     [super viewDidLoad];
     self.title = @"Weather info";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(back)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(clear)];
     
     AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
     _managedObjectContext = appDelegate.managedObjectContext;
@@ -53,6 +54,20 @@
 - (void) back {
     
     [self.tabBarController setSelectedIndex:0];
+}
+
+- (void) clear {
+   
+    int i = 0;
+
+   for (id object in [_fetchedResultsController fetchedObjects])
+   {
+       if ( i != 0)
+       [_managedObjectContext deleteObject:object];
+       i++;
+   }
+    
+    
 }
 
 - (void)didReceiveMemoryWarning
