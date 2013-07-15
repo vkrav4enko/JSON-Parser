@@ -9,8 +9,11 @@
 #import "ViewController.h"
 #import "ParseJSON.h"
 #import "Annotation.h"
-@interface ViewController () <UIAlertViewDelegate>
+#import "AppDelegate.h"
+#import "WeatherInfo.h"
 
+@interface ViewController () <UIAlertViewDelegate>
+@property (nonatomic, strong) id parsedDictionary;
 
 @property (nonatomic, strong) NSTimer *timer;
 
@@ -22,6 +25,8 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    self.title = @"Weather map";
+    
     
     _locationManager = [CLLocationManager new];
     _locationManager.delegate = self;
@@ -42,7 +47,13 @@
     buttonHome.frame = CGRectMake(0.0f, 7.0f, 50.0f, 30.0f);
     [buttonHome setTitle:@"Home" forState:UIControlStateNormal];
     [buttonHome addTarget:self action:@selector(showCurrentLocation:) forControlEvents:UIControlEventTouchDown];
-    [self.view addSubview:buttonHome];     
+    [self.view addSubview:buttonHome];
+    
+    UIButton *buttonWeather = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    buttonWeather.frame = CGRectMake(270.0f, 7.0f, 50.0f, 30.0f);
+    [buttonWeather setTitle:@"Show" forState:UIControlStateNormal];
+    [buttonWeather addTarget:self action:@selector(showWeather:) forControlEvents:UIControlEventTouchDown];
+    [self.view addSubview:buttonWeather];
 }
 
 - (void)timerFired:(NSTimer*)theTimer{
@@ -70,7 +81,8 @@
     
     ParseJSON *parser = [[ParseJSON alloc] initWithString:weather];
     id obj = [parser parse];
-    
+    _parsedDictionary  = obj;
+    NSLog(@"%@", obj);
     
     Annotation *annotation = [Annotation new];
     annotation.title = @"Current location";
@@ -90,9 +102,35 @@
 
 - (void)showCurrentLocation:(UIButton*)sender {
     
-        [_locationManager startUpdatingLocation];
-        [_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:1.0f];
-        [self.view endEditing:YES];
+    [_locationManager startUpdatingLocation];
+    [_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:1.0f];
+    [self.view endEditing:YES];
+}
+
+- (void) showWeather: (UIButton*) sender {
+    
+    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    NSManagedObjectContext *context = appDelegate.managedObjectContext;
+    WeatherInfo* newWeatherInfo = [NSEntityDescription insertNewObjectForEntityForName:@"WeatherInfo" inManagedObjectContext:context];
+    
+    newWeatherInfo.city = [_parsedDictionary objectForKey:@"name"];
+    newWeatherInfo.clouds = [NSString stringWithFormat:@"Clouds: %@%%",[[_parsedDictionary objectForKey:@"clouds"] objectForKey:@"all"]];
+    newWeatherInfo.wind = [NSString stringWithFormat:@"Wind: %@ mps", [[_parsedDictionary objectForKey:@"wind"] objectForKey:@"speed"]];
+    newWeatherInfo.humidity = [NSString stringWithFormat:@"Humidity: %@%%", [[_parsedDictionary objectForKey:@"main"] objectForKey:@"humidity"]];
+    NSNumber *temperature = [[_parsedDictionary objectForKey:@"main"] objectForKey:@"temp"];    
+    [NSString stringWithFormat:@"temperature = %.0f ºC", [temperature floatValue] - 273.15f];
+    newWeatherInfo.temperature = [NSString stringWithFormat:@"temperature = %.0f ºC", [temperature floatValue] - 273.15f];
+    newWeatherInfo.pressure = [NSString stringWithFormat:@"Pressure: %@hPa", [[_parsedDictionary objectForKey:@"main"] objectForKey:@"pressure"]];
+    newWeatherInfo.timeStamp = [NSDate date];
+    
+    NSError *error;
+    if (![context save:&error]) {
+        NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
+    }
+    
+    [self.tabBarController setSelectedIndex:1];
+
+
 }
 
 
@@ -143,6 +181,7 @@
         
         ParseJSON *parser2 = [[ParseJSON alloc] initWithString:weather];
         id obj2 = [parser2 parse];
+        _parsedDictionary  = obj2;
         
         NSNumber *temperature = [[obj2 objectForKey:@"main"] objectForKey:@"temp"];
         

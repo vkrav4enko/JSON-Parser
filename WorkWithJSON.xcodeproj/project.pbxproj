@@ -31,6 +31,11 @@
 		E79DD31C178C2CAF005514BB /* Annotation.m in Sources */ = {isa = PBXBuildFile; fileRef = E79DD31B178C2CAF005514BB /* Annotation.m */; };
 		E79DD31D178C2D6C005514BB /* Annotation.h in Sources */ = {isa = PBXBuildFile; fileRef = E79DD31A178C2CAF005514BB /* Annotation.h */; };
 		E79DD31E178C2D7A005514BB /* Annotation.m in Sources */ = {isa = PBXBuildFile; fileRef = E79DD31B178C2CAF005514BB /* Annotation.m */; };
+		E7CA94BA1793E81000C86140 /* Weather.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E7CA94B81793E81000C86140 /* Weather.xcdatamodeld */; };
+		E7CA94BC1793E99200C86140 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7CA94BB1793E99200C86140 /* CoreData.framework */; };
+		E7CA94C11793F25B00C86140 /* WeatherInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E7CA94C01793F25B00C86140 /* WeatherInfoViewController.m */; };
+		E7CA94C41793F28D00C86140 /* WeatherDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E7CA94C31793F28D00C86140 /* WeatherDetailViewController.m */; };
+		E7CA94C71793F36400C86140 /* WeatherInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = E7CA94C61793F36400C86140 /* WeatherInfo.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +78,14 @@
 		E79DD318178C176B005514BB /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		E79DD31A178C2CAF005514BB /* Annotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Annotation.h; sourceTree = "<group>"; };
 		E79DD31B178C2CAF005514BB /* Annotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Annotation.m; sourceTree = "<group>"; };
+		E7CA94B91793E81000C86140 /* Weather.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Weather.xcdatamodel; sourceTree = "<group>"; };
+		E7CA94BB1793E99200C86140 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		E7CA94BF1793F25B00C86140 /* WeatherInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeatherInfoViewController.h; sourceTree = "<group>"; };
+		E7CA94C01793F25B00C86140 /* WeatherInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WeatherInfoViewController.m; sourceTree = "<group>"; };
+		E7CA94C21793F28D00C86140 /* WeatherDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeatherDetailViewController.h; sourceTree = "<group>"; };
+		E7CA94C31793F28D00C86140 /* WeatherDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WeatherDetailViewController.m; sourceTree = "<group>"; };
+		E7CA94C51793F36400C86140 /* WeatherInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeatherInfo.h; sourceTree = "<group>"; };
+		E7CA94C61793F36400C86140 /* WeatherInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WeatherInfo.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +93,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E7CA94BC1793E99200C86140 /* CoreData.framework in Frameworks */,
 				E79DD319178C176B005514BB /* MapKit.framework in Frameworks */,
 				E79DD317178C0244005514BB /* CoreLocation.framework in Frameworks */,
 				E7710DBC178A9DF500C3472A /* UIKit.framework in Frameworks */,
@@ -123,6 +137,7 @@
 		E7710DBA178A9DF500C3472A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E7CA94BB1793E99200C86140 /* CoreData.framework */,
 				E79DD318178C176B005514BB /* MapKit.framework */,
 				E79DD316178C0244005514BB /* CoreLocation.framework */,
 				E7710DBB178A9DF500C3472A /* UIKit.framework */,
@@ -136,11 +151,9 @@
 		E7710DC1178A9DF500C3472A /* WorkWithJSON */ = {
 			isa = PBXGroup;
 			children = (
-				E7710DCA178A9DF500C3472A /* AppDelegate.h */,
-				E7710DCB178A9DF500C3472A /* AppDelegate.m */,
-				E7710DD3178A9DF600C3472A /* MainStoryboard.storyboard */,
-				E7710DD6178A9DF600C3472A /* ViewController.h */,
-				E7710DD7178A9DF600C3472A /* ViewController.m */,
+				E7CA94C81793F43800C86140 /* Main */,
+				E7CA94BE1793F1A600C86140 /* Controllers */,
+				E7CA94BD1793ED8700C86140 /* Model and model classes */,
 				E79DD31A178C2CAF005514BB /* Annotation.h */,
 				E79DD31B178C2CAF005514BB /* Annotation.m */,
 				E7710DC2178A9DF500C3472A /* Supporting Files */,
@@ -182,6 +195,39 @@
 				E7710DE8178A9DF600C3472A /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		E7CA94BD1793ED8700C86140 /* Model and model classes */ = {
+			isa = PBXGroup;
+			children = (
+				E7CA94B81793E81000C86140 /* Weather.xcdatamodeld */,
+				E7CA94C51793F36400C86140 /* WeatherInfo.h */,
+				E7CA94C61793F36400C86140 /* WeatherInfo.m */,
+			);
+			name = "Model and model classes";
+			sourceTree = "<group>";
+		};
+		E7CA94BE1793F1A600C86140 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				E7CA94BF1793F25B00C86140 /* WeatherInfoViewController.h */,
+				E7CA94C01793F25B00C86140 /* WeatherInfoViewController.m */,
+				E7CA94C21793F28D00C86140 /* WeatherDetailViewController.h */,
+				E7CA94C31793F28D00C86140 /* WeatherDetailViewController.m */,
+				E7710DD6178A9DF600C3472A /* ViewController.h */,
+				E7710DD7178A9DF600C3472A /* ViewController.m */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		E7CA94C81793F43800C86140 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				E7710DCA178A9DF500C3472A /* AppDelegate.h */,
+				E7710DCB178A9DF500C3472A /* AppDelegate.m */,
+				E7710DD3178A9DF600C3472A /* MainStoryboard.storyboard */,
+			);
+			name = Main;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -302,6 +348,10 @@
 				E7710DD8178A9DF600C3472A /* ViewController.m in Sources */,
 				E7710DF8178A9E3F00C3472A /* ParseJSON.m in Sources */,
 				E7710E02178AE29F00C3472A /* test.js in Sources */,
+				E7CA94BA1793E81000C86140 /* Weather.xcdatamodeld in Sources */,
+				E7CA94C11793F25B00C86140 /* WeatherInfoViewController.m in Sources */,
+				E7CA94C41793F28D00C86140 /* WeatherDetailViewController.m in Sources */,
+				E7CA94C71793F36400C86140 /* WeatherInfo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -495,6 +545,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		E7CA94B81793E81000C86140 /* Weather.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				E7CA94B91793E81000C86140 /* Weather.xcdatamodel */,
+			);
+			currentVersion = E7CA94B91793E81000C86140 /* Weather.xcdatamodel */;
+			path = Weather.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = E7710DB0178A9DF500C3472A /* Project object */;
 }
