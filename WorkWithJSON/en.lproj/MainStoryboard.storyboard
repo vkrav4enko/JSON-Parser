@@ -44,6 +44,7 @@
                     <tabBarItem key="tabBarItem" title="Item" id="QwA-B5-BKh"/>
                     <connections>
                         <outlet property="mapView" destination="MkJ-te-onP" id="bhz-7l-ZKe"/>
+                        <outlet property="textField" destination="tFP-FY-5AR" id="Mjh-B5-tMi"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4" sceneMemberID="firstResponder"/>

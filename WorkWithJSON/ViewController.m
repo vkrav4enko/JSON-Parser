@@ -15,8 +15,8 @@
 
 @interface ViewController () <UIAlertViewDelegate>
 
-
 @property (nonatomic, strong) NSTimer *timer;
+- (BOOL) findWithCityName: (NSString *) city;
 
 @end
 
@@ -109,35 +109,45 @@
 }
 
 - (void) showWeather: (UIButton*) sender {
-    
-    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
-    NSManagedObjectContext *context = appDelegate.managedObjectContext;
-    WeatherInfo* newWeatherInfo = [NSEntityDescription insertNewObjectForEntityForName:@"WeatherInfo" inManagedObjectContext:context];
-    newWeatherInfo.city = [_parsedDictionary objectForKey:@"name"];
-    newWeatherInfo.clouds = [NSString stringWithFormat:@"Clouds: %@%%",[[_parsedDictionary objectForKey:@"clouds"] objectForKey:@"all"]];
-    newWeatherInfo.wind = [NSString stringWithFormat:@"Wind: %@ mps", [[_parsedDictionary objectForKey:@"wind"] objectForKey:@"speed"]];
-    newWeatherInfo.humidity = [NSString stringWithFormat:@"Humidity: %@%%", [[_parsedDictionary objectForKey:@"main"] objectForKey:@"humidity"]];
-    NSNumber *temperature = [[_parsedDictionary objectForKey:@"main"] objectForKey:@"temp"];    
-    [NSString stringWithFormat:@"temperature = %.0f ºC", [temperature floatValue] - 273.15f];
-    newWeatherInfo.temperature = [NSString stringWithFormat:@"%.0f", [temperature floatValue] - 273.15f];
-    newWeatherInfo.pressure = [NSString stringWithFormat:@"Pressure: %@hPa", [[_parsedDictionary objectForKey:@"main"] objectForKey:@"pressure"]];
-    newWeatherInfo.timeStamp = [NSDate date];
-    
-    
-    NSString *filter = [NSString stringWithFormat:@"city like \"%@\"", [_parsedDictionary objectForKey:@"name"]];
-    NSArray *entities = [WeatherInfo findAllSortedBy:@"city" ascending:NO withPredicate:[NSPredicate predicateWithFormat:filter] inContext:context];
-    NSLog(@"%@", entities);
-    WeatherInfo *info = [entities objectAtIndex:0];
-    NSLog(@"%@", info.city);
-    
-
-    
-    NSError *error;
-    if (![context save:&error]) {
-        NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
+    NSLog(@"%@", _textField.text);
+    if(![self findWithCityName:_textField.text] && ![_textField.text isEqualToString:@""])
+    {
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Oops" message:@"City name is not correct" delegate:self cancelButtonTitle:@"Try again" otherButtonTitles: @"I don't care", nil];
+        alert.tag = 0;
+        [alert show];
+                
     }
-    
-    [self.tabBarController setSelectedIndex:1];
+    else
+    {        
+        AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+        NSManagedObjectContext *context = appDelegate.managedObjectContext;
+        WeatherInfo* newWeatherInfo = [NSEntityDescription insertNewObjectForEntityForName:@"WeatherInfo" inManagedObjectContext:context];
+        newWeatherInfo.city = [_parsedDictionary objectForKey:@"name"];
+        newWeatherInfo.clouds = [NSString stringWithFormat:@"Clouds: %@%%",[[_parsedDictionary objectForKey:@"clouds"] objectForKey:@"all"]];
+        newWeatherInfo.wind = [NSString stringWithFormat:@"Wind: %@ mps", [[_parsedDictionary objectForKey:@"wind"] objectForKey:@"speed"]];
+        newWeatherInfo.humidity = [NSString stringWithFormat:@"Humidity: %@%%", [[_parsedDictionary objectForKey:@"main"] objectForKey:@"humidity"]];
+        NSNumber *temperature = [[_parsedDictionary objectForKey:@"main"] objectForKey:@"temp"];    
+        [NSString stringWithFormat:@"temperature = %.0f ºC", [temperature floatValue] - 273.15f];
+        newWeatherInfo.temperature = [NSString stringWithFormat:@"%.0f", [temperature floatValue] - 273.15f];
+        newWeatherInfo.pressure = [NSString stringWithFormat:@"Pressure: %@hPa", [[_parsedDictionary objectForKey:@"main"] objectForKey:@"pressure"]];
+        newWeatherInfo.timeStamp = [NSDate date];
+        
+        
+        NSString *filter = [NSString stringWithFormat:@"city like \"%@\"", [_parsedDictionary objectForKey:@"name"]];
+        NSArray *entities = [WeatherInfo findAllSortedBy:@"city" ascending:NO withPredicate:[NSPredicate predicateWithFormat:filter] inContext:context];
+        NSLog(@"%@", entities);
+        WeatherInfo *info = [entities objectAtIndex:0];
+        NSLog(@"%@", info.city);
+        
+
+        
+        NSError *error;
+        if (![context save:&error]) {
+            NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
+        }
+        
+        [self.tabBarController setSelectedIndex:1];
+    }
 
 
 }
@@ -164,15 +174,15 @@
     
 }
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField
+- (BOOL) findWithCityName: (NSString *) city
 {
     @try {
         [_mapView removeAnnotations:_mapView.annotations];
         Annotation *annotation = [Annotation new];
-        annotation.title = textField.text;
+        annotation.title = city;
         
         
-        NSString *cityName = [NSString stringWithString:textField.text];
+        NSString *cityName = [NSString stringWithString:city];
         NSString *strURL = [NSString stringWithFormat:@"http://maps.google.com/maps/api/geocode/json?address=%@&sensor=true", cityName];
         NSString *geocode  = [NSString stringWithContentsOfURL:[NSURL URLWithString:strURL] encoding:NSUTF8StringEncoding error:nil];
         ParseJSON *parcer = [[ParseJSON alloc] initWithString:geocode];
@@ -208,12 +218,21 @@
         [self.mapView setRegion:region animated:YES];
         [self.view endEditing:YES];
         [self openAnnotation:annotation];
-        }
+        return YES;
+    }
     @catch (NSException *exception) {
-        NSLog(@"Error with exception: %@ for reason: %@", [exception name], [exception reason]);
+        return NO;
+    }
+
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    if (![self findWithCityName:textField.text])
+    {
         UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"City name is not correct" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+        alert.tag = 1;
         [alert show];
-       
     }
     return YES;
 
@@ -221,7 +240,19 @@
 
 -(void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    [self showCurrentLocation:nil];
+    if (alertView.tag == 1)
+        [self showCurrentLocation:nil];
+    else
+    {
+        if (buttonIndex == 0)
+        {
+            [self.tabBarController setSelectedIndex:0];
+            [_textField becomeFirstResponder];
+        }
+        else
+            [self.tabBarController setSelectedIndex:1];
+              
+    }
 }
 
 -(BOOL)textFieldShouldBeginEditing:(UITextField *)textField

@@ -187,8 +187,8 @@
 {
     _weatherInfo = [_fetchedResultsController objectAtIndexPath:indexPath];
     WeatherDetailViewController *detailController = [self.navigationController.viewControllers objectAtIndex:1];
-    detailController.city.text = [NSString stringWithFormat:@"City: %@", _weatherInfo.city];
-    detailController.temp.text = _weatherInfo.temperature;
+    detailController.city.text = [NSString stringWithFormat:@"City: %@", _weatherInfo.city];       
+    detailController.temp.text = [NSString stringWithFormat:@"Temperature = %@ºC", _weatherInfo.temperature] ;
     detailController.cloud.text = _weatherInfo.clouds;
     detailController.presure.text = _weatherInfo.pressure;
     detailController.humidity.text = _weatherInfo.humidity;
