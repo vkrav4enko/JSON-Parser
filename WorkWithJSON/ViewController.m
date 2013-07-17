@@ -104,7 +104,7 @@
 - (void)showCurrentLocation:(UIButton*)sender {
     
     [_locationManager startUpdatingLocation];
-    [_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:1.0f];
+    [_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:5.0f];
     [self.view endEditing:YES];
 }
 

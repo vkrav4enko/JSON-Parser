@@ -12,10 +12,11 @@
 #import "NSManagedObject+ActiveRecord.h"
 #import "WeatherInfoViewController.h"
 
+
 @interface GraphViewController ()
 @property (nonatomic, strong) CPTBarPlot *tempPlot;
 @property (nonatomic, strong) NSArray *arrayWithEntities;
-@property (nonatomic, strong) CPTPlotSpaceAnnotation *priceAnnotation;
+
 -(void)configureHost;
 -(void)initPlot;
 -(void)configureGraph;
@@ -54,10 +55,10 @@ CGFloat const CPDBarInitialX2 = 0.5f;
    
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"dd MMM"];
-    NSDate *refDate       = [NSDate date];
-    CPTTimeFormatter *timeFormatter = [[CPTTimeFormatter alloc] initWithDateFormatter:dateFormatter];
-    timeFormatter.referenceDate = refDate;
+    [dateFormatter setDateFormat:@"yyyyMMdd"];
+    NSDate *today = [NSDate date];
+        
+
     NSTimeInterval oneDay = 24 * 60 * 60;
     
     
@@ -72,8 +73,8 @@ CGFloat const CPDBarInitialX2 = 0.5f;
     CPTXYPlotSpace *plotSpace = (CPTXYPlotSpace *)graph.defaultPlotSpace;
     
     CGFloat xMin = - oneDay * 20 + 10;
-    CGFloat xMax = oneDay * 20;
-    CGFloat yMin = -5.0f;
+    CGFloat xMax = oneDay * 30;
+    CGFloat yMin = -10.0f;
     CGFloat yMax = 48.0f;
     plotSpace.xRange = [CPTPlotRange plotRangeWithLocation:CPTDecimalFromFloat(xMin) length:CPTDecimalFromFloat(xMax)];
     plotSpace.yRange = [CPTPlotRange plotRangeWithLocation:CPTDecimalFromFloat(yMin) length:CPTDecimalFromFloat(yMax)];
@@ -84,16 +85,46 @@ CGFloat const CPDBarInitialX2 = 0.5f;
     
     plotSpace.globalYRange = globalYRange;
     
+   
+    
     // Axes
     CPTXYAxisSet *axisSet = (CPTXYAxisSet *)graph.axisSet;
        
-    CPTXYAxis *x          = axisSet.xAxis;
-    x.majorIntervalLength         = CPTDecimalFromFloat(oneDay*2);
+    CPTXYAxis *x = axisSet.xAxis;
+    CPTMutableLineStyle *tickLineStyle = [CPTMutableLineStyle lineStyle];
+    tickLineStyle.lineColor = [CPTColor grayColor];
+    tickLineStyle.lineWidth = 1.0f;
+
+    x.majorIntervalLength         = CPTDecimalFromFloat(oneDay*30);
     x.orthogonalCoordinateDecimal = CPTDecimalFromString(@"2");
-    x.minorTicksPerInterval       = 0;
+    x.labelAlignment = CPTAlignmentCenter;
+    x.labelOffset = 9;
     
+    x.majorTickLineStyle = tickLineStyle;
+    x.majorTickLength = 5.0f;
     
-    x.labelFormatter            = timeFormatter;
+    x.minorTickLength = 5.0f;
+    x.minorTickLabelOffset = 0;
+    
+
+
+    
+    //Date formatter set
+    NSDateFormatter *majorDateFormatter = [[NSDateFormatter alloc] init];
+    NSDateFormatter *minorDateFormatter = [[NSDateFormatter alloc] init];
+    [majorDateFormatter setDateFormat: @"MMMM"];
+    [minorDateFormatter setDateFormat: @"d"];
+    x.minorTicksPerInterval = 30; // every day
+    CPTTimeFormatter  *majorTimeFormatter = [[CPTTimeFormatter alloc] initWithDateFormatter:majorDateFormatter];
+    CPTTimeFormatter  *minorTimeFormatter = [[CPTTimeFormatter alloc] initWithDateFormatter:minorDateFormatter];
+    
+    majorTimeFormatter.referenceDate = today;
+    minorTimeFormatter.referenceDate = today;
+    
+    x.labelFormatter = majorTimeFormatter;
+    x.minorTickLabelFormatter = minorTimeFormatter;
+
+
     
     CPTXYAxis *y = axisSet.yAxis;
     y.majorIntervalLength         = CPTDecimalFromString(@"10");
@@ -104,7 +135,12 @@ CGFloat const CPDBarInitialX2 = 0.5f;
     
     // Create a plot that uses the data source method
     CPTScatterPlot *dataSourceLinePlot = [[CPTScatterPlot alloc] init];
+    dataSourceLinePlot.delegate = self;
     dataSourceLinePlot.identifier = @"Date Plot";
+    CPTPlotSymbol *plotSymbol = [CPTPlotSymbol ellipsePlotSymbol];
+    plotSymbol.size = CGSizeMake(10.0f, 10.0f);
+    plotSymbol.fill = [CPTFill fillWithColor:[CPTColor greenColor]];
+    dataSourceLinePlot.plotSymbol = plotSymbol;
     
     CPTMutableLineStyle *lineStyle = [dataSourceLinePlot.dataLineStyle mutableCopy];
     lineStyle.lineWidth              = 3.f;
@@ -117,7 +153,7 @@ CGFloat const CPDBarInitialX2 = 0.5f;
     // Add some data
     NSMutableArray *newData = [NSMutableArray array];
     NSUInteger dayInHistory;
-    float temp = 0;
+    
     for ( dayInHistory = 0; dayInHistory < 10; dayInHistory++ ) {
         NSDateFormatter *dateFormatter2 = [NSDateFormatter new];
         [dateFormatter2 setDateFormat:@"yyyyMMdd"];
@@ -127,36 +163,21 @@ CGFloat const CPDBarInitialX2 = 0.5f;
         NSDate *currentDate = [NSDate dateWithTimeInterval:x sinceDate:[NSDate date]];
         NSString *currentDateString = [dateFormatter2 stringFromDate:currentDate];
         
-        NSString *filter = [NSString stringWithFormat:@"sectionIdentifier == %i", [currentDateString integerValue]];
+        NSString *filter = [NSString stringWithFormat:@"sectionIdentifier == %i and city like \"San Francisco\"", [currentDateString integerValue]];
         _arrayWithEntities = [WeatherInfo findAllSortedBy:@"timeStamp" ascending:YES withPredicate:[NSPredicate predicateWithFormat:filter] inContext:context];
         //NSLog (@"%@",_arrayWithEntities);
         
-        id y;
-    
-        float averageValue = 0;
-        if (_arrayWithEntities.count)
-        {
-            for (int i = 0; i < _arrayWithEntities.count; i++)
-            {
-                _weatherInfo = [_arrayWithEntities objectAtIndex:i];
-                averageValue += [_weatherInfo.temperature floatValue];
-            }
-            averageValue /= _arrayWithEntities.count;
-            NSLog(@"%f", averageValue);
-            y = [NSDecimalNumber numberWithFloat:averageValue];
-            temp = averageValue;
-        }
-        else
-            y = [NSDecimalNumber numberWithFloat:temp];
+      
+        
        
         
         
         
-        //id y             = [NSDecimalNumber numberWithFloat:1.2 * rand() / (float)RAND_MAX + 1.2];
+      
         [newData addObject:
          [NSDictionary dictionaryWithObjectsAndKeys:
           [NSDecimalNumber numberWithFloat:x], [NSNumber numberWithInt:CPTScatterPlotFieldX],
-          y, [NSNumber numberWithInt:CPTScatterPlotFieldY],
+          _arrayWithEntities, [NSNumber numberWithInt:CPTScatterPlotFieldY],
           nil]];
     }
     _plotData = newData;
@@ -172,8 +193,30 @@ CGFloat const CPDBarInitialX2 = 0.5f;
 
 -(NSNumber *)numberForPlot:(CPTPlot *)plot field:(NSUInteger)fieldEnum recordIndex:(NSUInteger)index
 {
-    NSDecimalNumber *num = [[_plotData objectAtIndex:index] objectForKey:[NSNumber numberWithInt:fieldEnum]];
+    NSNumber *num = [NSNumber new];
     
+    if (fieldEnum == CPTScatterPlotFieldX)
+    {
+        num = [[_plotData objectAtIndex:index] objectForKey:[NSNumber numberWithInt:fieldEnum]];        
+    }
+    else
+    {
+        NSArray *array = [[_plotData objectAtIndex:index] objectForKey:[NSNumber numberWithInt:fieldEnum]];
+        float averageValue = 0;
+        if (array.count)
+        {
+            for (int i = 0; i < array.count; i++)
+            {
+                _weatherInfo = [array objectAtIndex:i];
+                averageValue += [_weatherInfo.temperature floatValue];
+            }
+            averageValue /= array.count;
+            NSLog(@"%f", averageValue);
+            num = [NSNumber numberWithFloat:averageValue];
+        }
+        
+        
+    }
     return num;
 }
 
@@ -183,6 +226,51 @@ CGFloat const CPDBarInitialX2 = 0.5f;
     if (toInterfaceOrientation == UIInterfaceOrientationPortrait)
         [self.navigationController popViewControllerAnimated:YES];
 }
+
+- (void)scatterPlot:(CPTScatterPlot *)plot plotSymbolWasSelectedAtRecordIndex:(NSUInteger)idx
+{
+    //1 - Prepare data
+    NSArray *array = [[_plotData objectAtIndex:idx] objectForKey:[NSNumber numberWithInt:CPTScatterPlotFieldY]];
+    _weatherInfo = [array objectAtIndex:0];
+    float temperature = [[self numberForPlot:plot field:CPTScatterPlotFieldY recordIndex:idx] floatValue];
+    
+    
+    // 2 - Create style, if necessary
+    static CPTMutableTextStyle *style = nil;
+    if (!style) {
+        style = [CPTMutableTextStyle textStyle];
+        style.color= [CPTColor yellowColor];
+        style.fontSize = 12.0f;
+        style.fontName = @"Helvetica-Bold";
+    }
+    
+    // 3 - Create annotation, if necessary
+    if (!self.weatherAnnotation) {
+        NSNumber *x = [NSNumber numberWithInt:0];
+        NSNumber *y = [NSNumber numberWithInt:0];
+        NSArray *anchorPoint = [NSArray arrayWithObjects:x, y, nil];
+        self.weatherAnnotation = [[CPTPlotSpaceAnnotation alloc] initWithPlotSpace:plot.plotSpace anchorPlotPoint:anchorPoint];
+    }
+    
+    
+    // 5 - Create text layer for annotation
+    NSString *weatherInfo = [NSString stringWithFormat:@"Temperature = %.0fºC\n%@\n%@\n%@\n%@", temperature, _weatherInfo.pressure, _weatherInfo.clouds, _weatherInfo.wind, _weatherInfo.humidity];
+    CPTTextLayer *textLayer = [[CPTTextLayer alloc] initWithText:weatherInfo style:style];
+    self.weatherAnnotation.contentLayer = textLayer;
+    // 6 - Get plot index based on identifier
+    
+    // 7 - Get the anchor point for annotation
+    CGFloat x = 0 ;
+    NSNumber *anchorX = [NSNumber numberWithFloat:x];
+    CGFloat y = temperature + 5;
+    NSNumber *anchorY = [NSNumber numberWithFloat:y];
+    self.weatherAnnotation.anchorPlotPoint = [NSArray arrayWithObjects:anchorX, anchorY, nil];
+    // 8 - Add the annotation
+    [plot.graph.plotAreaFrame.plotArea addAnnotation:self.weatherAnnotation];
+    
+}
+
+
 
 
 - (void)didReceiveMemoryWarning
