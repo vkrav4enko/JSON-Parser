@@ -29,6 +29,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    
     self.title = @"Weather info";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(back)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(clear)];
@@ -49,6 +51,17 @@
  
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+}
+
+
+
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
+    
+    if (fromInterfaceOrientation == UIInterfaceOrientationPortrait)
+    {
+        [self performSegueWithIdentifier:@"GraphView" sender:self];
+    }
 }
 
 - (void) back {
@@ -95,7 +108,8 @@
     
     NSFetchedResultsController *theFetchedResultsController =
     [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-                                        managedObjectContext:_managedObjectContext sectionNameKeyPath:nil
+                                        managedObjectContext:_managedObjectContext
+                                          sectionNameKeyPath:@"sectionIdentifier"
                                                    cacheName:@"Root"];
     self.fetchedResultsController = theFetchedResultsController;
     _fetchedResultsController.delegate = self;
@@ -107,7 +121,35 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return [[_fetchedResultsController sections] count];
+    NSInteger count = [[_fetchedResultsController sections] count];
+	return count;
+}
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    id <NSFetchedResultsSectionInfo> theSection = [[_fetchedResultsController sections] objectAtIndex:section];
+    /*
+     Section information derives from an event's sectionIdentifier, which is a string representing the number (year * 1000) + month.
+     To display the section title, convert the year and month components to a string representation.
+     */
+    static NSArray *monthSymbols = nil;
+    
+    if (!monthSymbols) {
+        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+        [formatter setCalendar:[NSCalendar currentCalendar]];
+        monthSymbols = [formatter monthSymbols] ;
+        
+    }
+    
+    NSInteger numericSection = [[theSection name] integerValue];
+    
+	NSInteger year = numericSection / 10000;
+	NSInteger month = (numericSection - (year * 10000)) / 100;
+    NSInteger day = numericSection - (year * 10000) - (month * 100) ;
+    
+	
+	NSString *titleString = [NSString stringWithFormat:@"%d %@ %d", day, [monthSymbols objectAtIndex:month-1], year];
+	
+	return titleString;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section

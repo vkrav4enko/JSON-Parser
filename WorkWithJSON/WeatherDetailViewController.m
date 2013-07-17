@@ -62,6 +62,7 @@ CGFloat const CPDBarInitialX = 0.5f;
     _arrayWithEntities = [WeatherInfo findAllSortedBy:@"timeStamp" ascending:YES withPredicate:[NSPredicate predicateWithFormat:filter] inContext:context];
     NSLog (@"%@",_arrayWithEntities);
     [self initPlot];
+    
 }
 
 #pragma mark - Chart behavior

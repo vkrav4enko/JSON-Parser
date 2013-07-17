@@ -122,6 +122,7 @@
         AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
         NSManagedObjectContext *context = appDelegate.managedObjectContext;
         WeatherInfo* newWeatherInfo = [NSEntityDescription insertNewObjectForEntityForName:@"WeatherInfo" inManagedObjectContext:context];
+        
         newWeatherInfo.city = [_parsedDictionary objectForKey:@"name"];
         newWeatherInfo.clouds = [NSString stringWithFormat:@"Clouds: %@%%",[[_parsedDictionary objectForKey:@"clouds"] objectForKey:@"all"]];
         newWeatherInfo.wind = [NSString stringWithFormat:@"Wind: %@ mps", [[_parsedDictionary objectForKey:@"wind"] objectForKey:@"speed"]];
@@ -246,8 +247,10 @@
     {
         if (buttonIndex == 0)
         {
+            [self showCurrentLocation:nil];
             [self.tabBarController setSelectedIndex:0];
             [_textField becomeFirstResponder];
+            
         }
         else
             [self.tabBarController setSelectedIndex:1];

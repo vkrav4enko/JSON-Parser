@@ -81,16 +81,50 @@
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </view>
                                 <connections>
-                                    <segue destination="YOv-If-MQi" kind="push" id="1p5-1O-3SK"/>
+                                    <segue destination="YOv-If-MQi" kind="push" identifier="DetailView" id="1p5-1O-3SK"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
                     </tableView>
                     <navigationItem key="navigationItem" title="Root View Controller" id="RWK-Du-30c"/>
+                    <connections>
+                        <segue destination="Qxv-1U-LW5" kind="push" identifier="GraphView" id="lro-ql-Dah"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FEy-XR-0Fm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="171" y="-40"/>
+        </scene>
+        <!--Graph View Controller-->
+        <scene sceneID="iGL-EN-ydA">
+            <objects>
+                <viewController id="Qxv-1U-LW5" customClass="GraphViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="tBy-2d-btA">
+                        <rect key="frame" x="0.0" y="64" width="568" height="207"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2Me-8j-lmg" customClass="CPTGraphHostingView">
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="2Me-8j-lmg" firstAttribute="bottom" secondItem="tBy-2d-btA" secondAttribute="bottom" type="default" id="TCh-fU-qZI"/>
+                            <constraint firstItem="2Me-8j-lmg" firstAttribute="leading" secondItem="tBy-2d-btA" secondAttribute="leading" type="default" id="mOk-pI-HVt"/>
+                            <constraint firstItem="2Me-8j-lmg" firstAttribute="top" secondItem="tBy-2d-btA" secondAttribute="top" type="default" id="oK5-KN-j2S"/>
+                            <constraint firstItem="2Me-8j-lmg" firstAttribute="trailing" secondItem="tBy-2d-btA" secondAttribute="trailing" type="default" id="oYK-su-UA5"/>
+                        </constraints>
+                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="pVa-do-66k"/>
+                    <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
+                    <connections>
+                        <outlet property="hostView" destination="2Me-8j-lmg" id="qbI-rX-h1c"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Vwr-6W-cet" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="119" y="647"/>
         </scene>
         <!--Weather Detail View Controller-->
         <scene sceneID="rOZ-SO-xkU">
@@ -213,36 +247,6 @@
             <point key="canvasLocation" x="-771" y="-390"/>
         </scene>
     </scenes>
-    <classes>
-        <class className="CPTGraphHostingView" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/CPTGraphHostingView.h"/>
-        </class>
-        <class className="NSLayoutConstraint" superclassName="NSObject">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
-        </class>
-        <class className="ViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="mapView" candidateClass="MKMapView"/>
-                <relationship kind="outlet" name="textField" candidateClass="UITextView"/>
-            </relationships>
-        </class>
-        <class className="WeatherDetailViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WeatherDetailViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="city" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="cloud" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="hostView" candidateClass="CPTGraphHostingView"/>
-                <relationship kind="outlet" name="humidity" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="presure" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="temp" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="wind" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="WeatherInfoViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/WeatherInfoViewController.h"/>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

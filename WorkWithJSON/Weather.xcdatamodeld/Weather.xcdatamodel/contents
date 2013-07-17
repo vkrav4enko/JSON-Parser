@@ -5,11 +5,12 @@
         <attribute name="clouds" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="humidity" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="pressure" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sectionIdentifier" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="temperature" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="timeStamp" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="timeStamp" attributeType="Date" syncable="YES"/>
         <attribute name="wind" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="WeatherInfo" positionX="-1190" positionY="-432" width="128" height="148"/>
+        <element name="WeatherInfo" positionX="-1190" positionY="-432" width="128" height="163"/>
     </elements>
 </model>

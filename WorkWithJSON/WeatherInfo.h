@@ -13,11 +13,16 @@
 @interface WeatherInfo : NSManagedObject
 
 @property (nonatomic, retain) NSDate * timeStamp;
+@property (nonatomic, retain) NSDate *primitiveTimeStamp;
+
 @property (nonatomic, retain) NSString * temperature;
 @property (nonatomic, retain) NSString * clouds;
 @property (nonatomic, retain) NSString * wind;
 @property (nonatomic, retain) NSString * pressure;
 @property (nonatomic, retain) NSString * city;
 @property (nonatomic, retain) NSString * humidity;
+
+@property (nonatomic, retain) NSString *sectionIdentifier;
+@property (nonatomic, retain) NSString *primitiveSectionIdentifier;
 
 @end
