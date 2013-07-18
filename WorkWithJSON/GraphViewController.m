@@ -162,14 +162,20 @@
 {
     [UIView setAnimationsEnabled:YES];
     if (UIDeviceOrientationIsLandscape(fromInterfaceOrientation)) {
+        UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+        if (orientation == UIDeviceOrientationPortrait)
+        {
         UIViewController *rootController = [[UIApplication sharedApplication].delegate.window rootViewController];
         [rootController dismissViewControllerAnimated:YES completion:^{
             
         }];
+        }
     }
 
 }
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (!UIDeviceOrientationIsLandscape(orientation))
     [UIView setAnimationsEnabled:NO];
     
     }
