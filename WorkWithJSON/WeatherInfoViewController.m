@@ -70,10 +70,8 @@
 }
 
 
-
-
 - (void)didRotate:(NSNotification *)notification
-{
+{    
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
     if (UIDeviceOrientationIsLandscape(orientation)) {
         [self performSegueWithIdentifier:@"GraphView" sender:self];

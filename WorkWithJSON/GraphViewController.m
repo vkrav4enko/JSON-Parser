@@ -35,24 +35,16 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-  
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    
-    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
     WeatherInfoViewController *masterController = [self.navigationController.viewControllers objectAtIndex:0];
     _weatherInfo = masterController.weatherInfo;
     NSManagedObjectContext *context = appDelegate.managedObjectContext;
-   
+    
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyyMMdd"];
     NSTimeInterval oneDay = 24 * 60 * 60;
-      
+    
     
     // Create graph from theme
     graph = [(CPTXYGraph *)[CPTXYGraph alloc] initWithFrame : CGRectZero];
@@ -62,7 +54,7 @@
     
     // Setup scatter plot space
     CPTXYPlotSpace *plotSpace = (CPTXYPlotSpace *)graph.defaultPlotSpace;
-    plotSpace.delegate = self;    
+    plotSpace.delegate = self;
     CGFloat xMin =[[NSDate date] timeIntervalSince1970] - oneDay * 31 * 0.5;
     CGFloat xMax = oneDay * 31;
     CGFloat yMin = -10.0f;
@@ -76,23 +68,23 @@
     
     plotSpace.globalYRange = globalYRange;
     
-   
+    
     
     // Axes
-    CPTXYAxisSet *axisSet = (CPTXYAxisSet *)graph.axisSet;       
+    CPTXYAxisSet *axisSet = (CPTXYAxisSet *)graph.axisSet;
     CPTXYAxis *x = axisSet.xAxis;
     x.tickDirection = CPTSignNegative;
     CPTMutableLineStyle *tickLineStyle = [CPTMutableLineStyle lineStyle];
     tickLineStyle.lineColor = [CPTColor grayColor];
     tickLineStyle.lineWidth = 1.0f;
-    x.majorIntervalLength = CPTDecimalFromFloat(oneDay*30);    
+    x.majorIntervalLength = CPTDecimalFromFloat(oneDay*30);
     x.labelAlignment = CPTAlignmentCenter;
-    x.labelOffset = 9;    
+    x.labelOffset = 9;
     x.majorTickLineStyle = tickLineStyle;
-    x.majorTickLength = 5.0f;    
+    x.majorTickLength = 5.0f;
     x.minorTickLength = 5.0f;
     x.minorTickLabelOffset = 0;
-        
+    
     //Date formatter set
     NSDateFormatter *majorDateFormatter = [[NSDateFormatter alloc] init];
     NSDateFormatter *minorDateFormatter = [[NSDateFormatter alloc] init];
@@ -148,23 +140,39 @@
         NSString *filter = [NSString stringWithFormat:@"sectionIdentifier == %i and city like \"San Francisco\"", [currentDateString integerValue]];
         _arrayWithEntities = [WeatherInfo findAllSortedBy:@"timeStamp" ascending:YES withPredicate:[NSPredicate predicateWithFormat:filter] inContext:context];
         //NSLog (@"%@",_arrayWithEntities);
-       [newData addObject:
+        [newData addObject:
          [NSDictionary dictionaryWithObjectsAndKeys:
           [NSDecimalNumber numberWithFloat:x], [NSNumber numberWithInt:CPTScatterPlotFieldX],
           _arrayWithEntities, [NSNumber numberWithInt:CPTScatterPlotFieldY],
           nil]];
     }
     _plotData = newData;
+    
+  
 }
 
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    if (UIDeviceOrientationIsPortrait(toInterfaceOrientation)) {
+- (void)viewDidAppear:(BOOL)animated
+{
+    
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    
+}
+
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    [UIView setAnimationsEnabled:YES];
+    if (UIDeviceOrientationIsLandscape(fromInterfaceOrientation)) {
         UIViewController *rootController = [[UIApplication sharedApplication].delegate.window rootViewController];
-        [rootController dismissViewControllerAnimated:NO completion:^{
+        [rootController dismissViewControllerAnimated:YES completion:^{
             
         }];
     }
+
 }
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    [UIView setAnimationsEnabled:NO];
+    
+    }
 
 
 

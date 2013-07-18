@@ -93,13 +93,17 @@
     NSNumber *temperature = [[obj objectForKey:@"main"] objectForKey:@"temp"];    
     annotation.subtitle = [NSString stringWithFormat:@"temperature = %.0f ºC", [temperature floatValue] - 273.15f];
     annotation.coordinate = CLLocationCoordinate2DMake(newLocation.coordinate.latitude, newLocation.coordinate.longitude);
-    [_mapView addAnnotation:annotation];
-    [self openAnnotation:annotation];
+    
     MKCoordinateRegion region = self.mapView.region;
     region.center = CLLocationCoordinate2DMake(newLocation.coordinate.latitude, newLocation.coordinate.longitude);
     region.span.longitudeDelta = 10.0f;
     region.span.latitudeDelta = 15.0f;
     [self.mapView setRegion:region animated:YES];
+    
+    [_mapView addAnnotation:annotation];
+    [self openAnnotation:annotation];
+    if (annotation)
+    [_locationManager stopUpdatingLocation];
     
 
 }
@@ -107,7 +111,7 @@
 - (void)showCurrentLocation:(UIButton*)sender {
     
     [_locationManager startUpdatingLocation];
-    [_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:1.0f];
+    //[_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:1.0f];
     [self.view endEditing:YES];
 }
 
@@ -238,6 +242,7 @@
         alert.tag = 1;
         [alert show];
     }
+    [textField endEditing:YES];
     return YES;
 
 }
