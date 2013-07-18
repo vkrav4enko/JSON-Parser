@@ -53,13 +53,29 @@
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
 
-
-
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
     
-    if (fromInterfaceOrientation == UIInterfaceOrientationPortrait)
-    {
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRotate:) name:UIDeviceOrientationDidChangeNotification object:nil];
+
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
+}
+
+
+
+
+- (void)didRotate:(NSNotification *)notification
+{
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIDeviceOrientationIsLandscape(orientation)) {
         [self performSegueWithIdentifier:@"GraphView" sender:self];
     }
 }

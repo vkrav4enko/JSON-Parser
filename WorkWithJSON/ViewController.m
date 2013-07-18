@@ -42,19 +42,11 @@
     
     [self showCurrentLocation:nil];
     _mapView.showsUserLocation = NO;
-    
-    
-    UIButton *buttonHome = [UIButton buttonWithType:UIButtonTypeRoundedRect];       
-    buttonHome.frame = CGRectMake(0.0f, 7.0f, 50.0f, 30.0f);
-    [buttonHome setTitle:@"Home" forState:UIControlStateNormal];
-    [buttonHome addTarget:self action:@selector(showCurrentLocation:) forControlEvents:UIControlEventTouchDown];
-    [self.view addSubview:buttonHome];
-    
-    UIButton *buttonWeather = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    buttonWeather.frame = CGRectMake(270.0f, 7.0f, 50.0f, 30.0f);
-    [buttonWeather setTitle:@"Show" forState:UIControlStateNormal];
-    [buttonWeather addTarget:self action:@selector(showWeather:) forControlEvents:UIControlEventTouchDown];
-    [self.view addSubview:buttonWeather];
+ 
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Home" style:UIBarButtonItemStyleBordered target:self action:@selector(showCurrentLocation:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Show" style:UIBarButtonItemStyleBordered target:self action:@selector(showWeather:)];
+                                             
+
 }
 
 - (void)timerFired:(NSTimer*)theTimer{
@@ -66,6 +58,17 @@
     [_locationManager startUpdatingLocation];
     
 }
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown);
+}
+
+- (NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
+}
+
 
 - (void)didReceiveMemoryWarning
 {
@@ -104,7 +107,7 @@
 - (void)showCurrentLocation:(UIButton*)sender {
     
     [_locationManager startUpdatingLocation];
-    [_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:5.0f];
+    [_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:1.0f];
     [self.view endEditing:YES];
 }
 
@@ -265,3 +268,31 @@
 }
 
 @end
+
+@implementation UINavigationController (autoRotate)
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown);
+}
+
+- (NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
+}
+
+@end
+
+@implementation UITabBarController (autoRotate)
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown);
+}
+
+- (NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
+}
+@end
+

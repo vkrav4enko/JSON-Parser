@@ -10,7 +10,7 @@
 #import <Foundation/Foundation.h>
 #import "WeatherInfo.h"
 
-@interface GraphViewController : UIViewController <CPTScatterPlotDataSource, CPTScatterPlotDelegate, CPTPlotDataSource, CPTPlotDelegate>
+@interface GraphViewController : UIViewController <CPTScatterPlotDataSource, CPTScatterPlotDelegate, CPTPlotDataSource, CPTPlotDelegate, CPTPlotSpaceDelegate>
 
 @property (weak, nonatomic) IBOutlet CPTGraphHostingView *hostView;
 

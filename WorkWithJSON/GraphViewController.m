@@ -17,18 +17,11 @@
 @property (nonatomic, strong) CPTBarPlot *tempPlot;
 @property (nonatomic, strong) NSArray *arrayWithEntities;
 
--(void)configureHost;
--(void)initPlot;
--(void)configureGraph;
--(void)configurePlots;
--(void)configureAxes;
-
 @end
 
 @implementation GraphViewController
 @synthesize graph;
-CGFloat const CPDBarWidth2 = 0.75f;
-CGFloat const CPDBarInitialX2 = 0.5f;
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -48,6 +41,8 @@ CGFloat const CPDBarInitialX2 = 0.5f;
 
 - (void)viewDidAppear:(BOOL)animated
 {
+    
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
     WeatherInfoViewController *masterController = [self.navigationController.viewControllers objectAtIndex:0];
     _weatherInfo = masterController.weatherInfo;
@@ -56,12 +51,8 @@ CGFloat const CPDBarInitialX2 = 0.5f;
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyyMMdd"];
-    NSDate *today = [NSDate date];
-        
-
     NSTimeInterval oneDay = 24 * 60 * 60;
-    
-    
+      
     
     // Create graph from theme
     graph = [(CPTXYGraph *)[CPTXYGraph alloc] initWithFrame : CGRectZero];
@@ -71,9 +62,9 @@ CGFloat const CPDBarInitialX2 = 0.5f;
     
     // Setup scatter plot space
     CPTXYPlotSpace *plotSpace = (CPTXYPlotSpace *)graph.defaultPlotSpace;
-    
-    CGFloat xMin = - oneDay * 20 + 10;
-    CGFloat xMax = oneDay * 30;
+    plotSpace.delegate = self;    
+    CGFloat xMin =[[NSDate date] timeIntervalSince1970] - oneDay * 31 * 0.5;
+    CGFloat xMax = oneDay * 31;
     CGFloat yMin = -10.0f;
     CGFloat yMax = 48.0f;
     plotSpace.xRange = [CPTPlotRange plotRangeWithLocation:CPTDecimalFromFloat(xMin) length:CPTDecimalFromFloat(xMax)];
@@ -88,43 +79,34 @@ CGFloat const CPDBarInitialX2 = 0.5f;
    
     
     // Axes
-    CPTXYAxisSet *axisSet = (CPTXYAxisSet *)graph.axisSet;
-       
+    CPTXYAxisSet *axisSet = (CPTXYAxisSet *)graph.axisSet;       
     CPTXYAxis *x = axisSet.xAxis;
+    x.tickDirection = CPTSignNegative;
     CPTMutableLineStyle *tickLineStyle = [CPTMutableLineStyle lineStyle];
     tickLineStyle.lineColor = [CPTColor grayColor];
     tickLineStyle.lineWidth = 1.0f;
-
-    x.majorIntervalLength         = CPTDecimalFromFloat(oneDay*30);
-    x.orthogonalCoordinateDecimal = CPTDecimalFromString(@"2");
+    x.majorIntervalLength = CPTDecimalFromFloat(oneDay*30);    
     x.labelAlignment = CPTAlignmentCenter;
-    x.labelOffset = 9;
-    
+    x.labelOffset = 9;    
     x.majorTickLineStyle = tickLineStyle;
-    x.majorTickLength = 5.0f;
-    
+    x.majorTickLength = 5.0f;    
     x.minorTickLength = 5.0f;
     x.minorTickLabelOffset = 0;
-    
-
-
-    
+        
     //Date formatter set
     NSDateFormatter *majorDateFormatter = [[NSDateFormatter alloc] init];
     NSDateFormatter *minorDateFormatter = [[NSDateFormatter alloc] init];
     [majorDateFormatter setDateFormat: @"MMMM"];
     [minorDateFormatter setDateFormat: @"d"];
-    x.minorTicksPerInterval = 30; // every day
+    x.minorTicksPerInterval = 29; // every day
     CPTTimeFormatter  *majorTimeFormatter = [[CPTTimeFormatter alloc] initWithDateFormatter:majorDateFormatter];
     CPTTimeFormatter  *minorTimeFormatter = [[CPTTimeFormatter alloc] initWithDateFormatter:minorDateFormatter];
     
-    majorTimeFormatter.referenceDate = today;
-    minorTimeFormatter.referenceDate = today;
+    majorTimeFormatter.referenceDate = [NSDate dateWithTimeIntervalSince1970:0];
+    minorTimeFormatter.referenceDate = [NSDate dateWithTimeIntervalSince1970:0];
     
     x.labelFormatter = majorTimeFormatter;
     x.minorTickLabelFormatter = minorTimeFormatter;
-
-
     
     CPTXYAxis *y = axisSet.yAxis;
     y.majorIntervalLength         = CPTDecimalFromString(@"10");
@@ -158,29 +140,36 @@ CGFloat const CPDBarInitialX2 = 0.5f;
         NSDateFormatter *dateFormatter2 = [NSDateFormatter new];
         [dateFormatter2 setDateFormat:@"yyyyMMdd"];
         
-        NSTimeInterval x = - oneDay * dayInHistory;
+        NSTimeInterval x = [[NSDate date] timeIntervalSince1970] - oneDay * dayInHistory;
         
-        NSDate *currentDate = [NSDate dateWithTimeInterval:x sinceDate:[NSDate date]];
+        NSDate *currentDate = [NSDate dateWithTimeInterval:(- oneDay * dayInHistory) sinceDate:[NSDate date]];
         NSString *currentDateString = [dateFormatter2 stringFromDate:currentDate];
         
         NSString *filter = [NSString stringWithFormat:@"sectionIdentifier == %i and city like \"San Francisco\"", [currentDateString integerValue]];
         _arrayWithEntities = [WeatherInfo findAllSortedBy:@"timeStamp" ascending:YES withPredicate:[NSPredicate predicateWithFormat:filter] inContext:context];
         //NSLog (@"%@",_arrayWithEntities);
-        
-      
-        
-       
-        
-        
-        
-      
-        [newData addObject:
+       [newData addObject:
          [NSDictionary dictionaryWithObjectsAndKeys:
           [NSDecimalNumber numberWithFloat:x], [NSNumber numberWithInt:CPTScatterPlotFieldX],
           _arrayWithEntities, [NSNumber numberWithInt:CPTScatterPlotFieldY],
           nil]];
     }
     _plotData = newData;
+}
+
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    if (UIDeviceOrientationIsPortrait(toInterfaceOrientation)) {
+        UIViewController *rootController = [[UIApplication sharedApplication].delegate.window rootViewController];
+        [rootController dismissViewControllerAnimated:NO completion:^{
+            
+        }];
+    }
+}
+
+
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 }
 
 #pragma mark -
@@ -220,13 +209,6 @@ CGFloat const CPDBarInitialX2 = 0.5f;
     return num;
 }
 
-
--(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
-{
-    if (toInterfaceOrientation == UIInterfaceOrientationPortrait)
-        [self.navigationController popViewControllerAnimated:YES];
-}
-
 - (void)scatterPlot:(CPTScatterPlot *)plot plotSymbolWasSelectedAtRecordIndex:(NSUInteger)idx
 {
     //1 - Prepare data
@@ -260,14 +242,25 @@ CGFloat const CPDBarInitialX2 = 0.5f;
     // 6 - Get plot index based on identifier
     
     // 7 - Get the anchor point for annotation
-    CGFloat x = 0 ;
+    CGFloat x = [[[_plotData objectAtIndex:idx] objectForKey:[NSNumber numberWithInt:CPTScatterPlotFieldX]] floatValue] ;
     NSNumber *anchorX = [NSNumber numberWithFloat:x];
-    CGFloat y = temperature + 5;
+    CGFloat y = 30;
     NSNumber *anchorY = [NSNumber numberWithFloat:y];
     self.weatherAnnotation.anchorPlotPoint = [NSArray arrayWithObjects:anchorX, anchorY, nil];
     // 8 - Add the annotation
     [plot.graph.plotAreaFrame.plotArea addAnnotation:self.weatherAnnotation];
     
+}
+
+
+
+- (BOOL)plotSpace:(CPTPlotSpace *)space shouldHandlePointingDeviceDownEvent:(UIEvent *)event atPoint:(CGPoint)point {
+    
+    if (self.weatherAnnotation) {
+        [graph.plotAreaFrame.plotArea removeAllAnnotations];
+        self.weatherAnnotation = nil;
+    }
+    return YES;
 }
 
 
