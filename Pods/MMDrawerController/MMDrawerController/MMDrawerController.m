@@ -150,7 +150,7 @@ static CAKeyframeAnimation * bounceKeyFrameAnimationForDistanceOnView(CGFloat di
 
 -(id)initWithCenterViewController:(UIViewController *)centerViewController leftDrawerViewController:(UIViewController *)leftDrawerViewController rightDrawerViewController:(UIViewController *)rightDrawerViewController{
     NSParameterAssert(centerViewController);
-    self = [super init];
+    self = [self init];
     if(self){
         [self setCenterViewController:centerViewController];
         [self setLeftDrawerViewController:leftDrawerViewController];
@@ -624,7 +624,9 @@ static CAKeyframeAnimation * bounceKeyFrameAnimationForDistanceOnView(CGFloat di
     }
 }
 
-
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation{
+    return YES;
+}
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
     [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
@@ -1009,18 +1011,17 @@ static inline CGFloat originXForDrawerOriginAndTargetOriginOffset(CGFloat origin
 #pragma mark - UIGestureRecognizerDelegate
 -(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch{
     CGPoint point = [touch locationInView:self.view];
-    BOOL shouldReceiveTouch = NO;
+    
     if(self.openSide == MMDrawerSideNone){
         MMOpenDrawerGestureMode possibleOpenGestureModes = [self possibleOpenGestureModesForGestureRecognizer:gestureRecognizer
                                                                                                withTouchPoint:point];
-        shouldReceiveTouch = ((self.openDrawerGestureModeMask & possibleOpenGestureModes)>0);
+        return ((self.openDrawerGestureModeMask & possibleOpenGestureModes)>0);
     }
     else{
         MMCloseDrawerGestureMode possibleCloseGestureModes = [self possibleCloseGestureModesForGestureRecognizer:gestureRecognizer
                                                                                                   withTouchPoint:point];
-        shouldReceiveTouch = ((self.closeDrawerGestureModeMask & possibleCloseGestureModes)>0);
+        return ((self.closeDrawerGestureModeMask & possibleCloseGestureModes)>0);
     }
-    return shouldReceiveTouch;
 }
 
 #pragma mark Gesture Recogizner Delegate Helpers
@@ -1041,12 +1042,7 @@ static inline CGFloat originXForDrawerOriginAndTargetOriginOffset(CGFloat origin
         if([self isPointContainedWithinCenterViewContentRect:point]){
             possibleCloseGestureModes |= MMCloseDrawerGestureModePanningCenterView;
         }
-        if([self isPointContainedWithRightBezelRect:point] &&
-           self.openSide == MMDrawerSideLeft){
-            possibleCloseGestureModes |= MMCloseDrawerGestureModeBezelPanningCenterView;
-        }
-        if([self isPointContainedWithinLeftBezelRect:point] &&
-           self.openSide == MMDrawerSideRight){
+        if([self isPointContainedWithinBezelRect:point]){
             possibleCloseGestureModes |= MMCloseDrawerGestureModeBezelPanningCenterView;
         }
         if([self isPointContainedWithinCenterViewContentRect:point] == NO &&
@@ -1066,15 +1062,9 @@ static inline CGFloat originXForDrawerOriginAndTargetOriginOffset(CGFloat origin
         if([self isPointContainedWithinCenterViewContentRect:point]){
             possibleOpenGestureModes |= MMOpenDrawerGestureModePanningCenterView;
         }
-        if([self isPointContainedWithinLeftBezelRect:point] &&
-           self.leftDrawerViewController){
+        if([self isPointContainedWithinBezelRect:point]){
             possibleOpenGestureModes |= MMOpenDrawerGestureModeBezelPanningCenterView;
         }
-        if([self isPointContainedWithRightBezelRect:point] &&
-           self.rightDrawerViewController){
-            possibleOpenGestureModes |= MMOpenDrawerGestureModeBezelPanningCenterView;
-        }
-        
     }
     return possibleOpenGestureModes;
 }
@@ -1097,30 +1087,17 @@ static inline CGFloat originXForDrawerOriginAndTargetOriginOffset(CGFloat origin
             [self isPointContainedWithinNavigationRect:point] == NO);
 }
 
--(BOOL)isPointContainedWithinLeftBezelRect:(CGPoint)point{
-    CGRect leftBezelRect = CGRectNull;
+-(BOOL)isPointContainedWithinBezelRect:(CGPoint)point{
+    CGRect leftBezelRect;
     CGRect tempRect;
     CGRectDivide(self.view.bounds, &leftBezelRect, &tempRect, MMDrawerBezelRange, CGRectMinXEdge);
-    return (CGRectContainsPoint(leftBezelRect, point) &&
-            [self isPointContainedWithinCenterViewContentRect:point]);
-}
-
--(BOOL)isPointContainedWithRightBezelRect:(CGPoint)point{
-    CGRect rightBezelRect = CGRectNull;
-    CGRect tempRect;
+    
+    CGRect rightBezelRect;
     CGRectDivide(self.view.bounds, &rightBezelRect, &tempRect, MMDrawerBezelRange, CGRectMaxXEdge);
     
-    return (CGRectContainsPoint(rightBezelRect, point) &&
-            [self isPointContainedWithinCenterViewContentRect:point]);
+    return ((CGRectContainsPoint(leftBezelRect, point) ||
+      CGRectContainsPoint(rightBezelRect, point)) &&
+     [self isPointContainedWithinCenterViewContentRect:point]);
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown);
-}
-
-- (NSUInteger)supportedInterfaceOrientations
-{
-    return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
-}
 @end
