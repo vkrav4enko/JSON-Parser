@@ -1,3 +1,5 @@
 platform:ios, '6.0'
-pod 'MMDrawerController', '~> 0.2.1'
 
+pod 'MMDrawerController', '~> 0.2.1'
+pod 'OpenWeatherMapAPI', '~> 0.0.5'
+pod 'CorePlot'
