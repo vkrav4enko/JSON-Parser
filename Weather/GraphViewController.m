@@ -130,14 +130,11 @@
     
     for ( dayInHistory = 0; dayInHistory < 10; dayInHistory++ ) {
         NSDateFormatter *dateFormatter2 = [NSDateFormatter new];
-        [dateFormatter2 setDateFormat:@"yyyyMMdd"];
-        
+        [dateFormatter2 setDateFormat:@"yyyyMMdd"];        
         NSTimeInterval x = [[NSDate date] timeIntervalSince1970] - oneDay * dayInHistory;
-        
         NSDate *currentDate = [NSDate dateWithTimeInterval:(- oneDay * dayInHistory) sinceDate:[NSDate date]];
-        NSString *currentDateString = [dateFormatter2 stringFromDate:currentDate];
-        
-        NSString *filter = [NSString stringWithFormat:@"sectionIdentifier == %i and city like \"San Francisco\"", [currentDateString integerValue]];
+        NSString *currentDateString = [dateFormatter2 stringFromDate:currentDate];        
+        NSString *filter = [NSString stringWithFormat:@"sectionIdentifier == %i", [currentDateString integerValue]];
         _arrayWithEntities = [WeatherInfo findAllSortedBy:@"timeStamp" ascending:YES withPredicate:[NSPredicate predicateWithFormat:filter] inContext:context];
         //NSLog (@"%@",_arrayWithEntities);
         [newData addObject:

@@ -4,6 +4,31 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>Pods-AFNetworking.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
+		<key>Pods-CorePlot.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
+		<key>Pods-MBProgressHUD.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
+		<key>Pods-MMDrawerController.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>5</integer>
+		</dict>
+		<key>Pods-OpenWeatherMapAPI.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>6</integer>
+		</dict>
 		<key>Pods.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -12,7 +37,37 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>0025B238CA6948209E5427FA</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>426185C4E2544A569D5CA43F</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>6E38EB0983F34F64931E9C53</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>7A5F25BB7A2B488FBC51F976</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>94367E5449AB447FBF9A50AB</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>C4B3BDF58C1847D5A7186754</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>F98F84FDA0524375830B5F9D</key>
 		<dict>
 			<key>primary</key>
 			<true/>

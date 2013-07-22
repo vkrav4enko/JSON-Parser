@@ -11,12 +11,17 @@
 #import "MMDrawerController.h"
 #import "UIViewController+MMDrawerController.h"
 #import "OWMWeatherAPI.h"
+#import "SearchViewController.h"
+#import "AppDelegate.h"
+#import "WeatherInfo.h"
+#import "NSManagedObject+ActiveRecord.h"
 
 @interface WeatherViewController ()
 
 @property (nonatomic, strong) NSArray *forecast;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, strong) OWMWeatherAPI *weatherAPI;
+@property (nonatomic, strong) NSDictionary *result;
 @end
 
 @implementation WeatherViewController
@@ -62,8 +67,80 @@
                                        userInfo:nil
                                         repeats:YES];
         
+    }   
+    
+    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    _cityName.text = appDelegate.cityName;
+    NSLog(@"%@",_cityName.text);
+    
+    if (![_cityName.text isEqualToString:@""])
+    {        
+        [_weatherAPI currentWeatherByCityName:_cityName.text withCallback:^(NSError *error, NSDictionary *result) {
+            if (error) {
+                NSLog(@"OpenWeatherApi error:");
+                return;
+            }
+            self.cityName.text = [NSString stringWithFormat:@"%@, %@",
+                                  result[@"name"],
+                                  result[@"sys"][@"country"]
+                                  ];
+            
+            self.currentTemp.text = [NSString stringWithFormat:@"%.1f℃",
+                                     [result[@"main"][@"temp"] floatValue] ];
+            
+            self.currentTimestamp.text =  [_dateFormatter stringFromDate:result[@"dt"]];
+            
+            self.weather.text = result[@"weather"][0][@"description"];
+            
+        }];
+        [_weatherAPI forecastWeatherByCityName:_cityName.text withCallback:^(NSError *error, NSDictionary *result) {
+            
+            if (error) {
+                NSLog(@"OpenWeatherApi error:");
+                return;
+            }
+            
+            _forecast = result[@"list"];
+            [self.forecastTableView reloadData];
+            [self.activityIndicator stopAnimating];
+            [_locationManager stopUpdatingLocation];
+            
+        }];
+        appDelegate.cityName = @"";
     }
-    [_locationManager startUpdatingLocation];
+    else
+    {
+        [_locationManager startUpdatingLocation];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Detail" style:UIBarButtonItemStyleBordered target:self action:@selector(showDetail:)];
+    }
+}
+
+- (void) showDetail: (id) sender{
+    
+    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    NSManagedObjectContext *context = appDelegate.managedObjectContext;
+    WeatherInfo* newWeatherInfo = [NSEntityDescription insertNewObjectForEntityForName:@"WeatherInfo" inManagedObjectContext:context];
+    newWeatherInfo.city = _result[@"name"];
+    newWeatherInfo.clouds = [NSString stringWithFormat:@"Clouds: %@%%",[[_result objectForKey:@"clouds"] objectForKey:@"all"]];
+    newWeatherInfo.wind = [NSString stringWithFormat:@"Wind: %@ mps", [[_result objectForKey:@"wind"] objectForKey:@"speed"]];
+    newWeatherInfo.humidity = [NSString stringWithFormat:@"Humidity: %@%%", [[_result objectForKey:@"main"] objectForKey:@"humidity"]];
+    NSNumber *temperature = [[_result objectForKey:@"main"] objectForKey:@"temp"];
+    newWeatherInfo.temperature = [NSString stringWithFormat:@"%.0f", [temperature floatValue] ];
+    newWeatherInfo.pressure = [NSString stringWithFormat:@"Pressure: %@hPa", [[_result objectForKey:@"main"] objectForKey:@"pressure"]];
+    newWeatherInfo.timeStamp = [NSDate date];
+    NSString *filter = [NSString stringWithFormat:@"city like \"%@\"", [_result objectForKey:@"name"]];
+    NSArray *entities = [WeatherInfo findAllSortedBy:@"city" ascending:NO withPredicate:[NSPredicate predicateWithFormat:filter] inContext:context];
+    NSLog(@"%@", entities);
+    WeatherInfo *info = [entities objectAtIndex:0];
+    NSLog(@"%@", info.city);
+
+    NSError *saveError;
+    if (![context save:&saveError]) {
+        NSLog(@"Whoops, couldn't save: %@", [saveError localizedDescription]);
+    }
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
+    UINavigationController * navigationController = [[UINavigationController alloc] initWithRootViewController:[storyboard instantiateViewControllerWithIdentifier:@"History"]];
+    [self.mm_drawerController setCenterViewController:navigationController withCloseAnimation:YES completion:nil];
 }
 
 -(void)leftDrawerButtonPress:(id)sender{
@@ -94,6 +171,7 @@
             NSLog(@"OpenWeatherApi error:");
             return;
         }
+        _result = result;
         self.cityName.text = [NSString stringWithFormat:@"%@, %@",
                               result[@"name"],
                               result[@"sys"][@"country"]
@@ -104,8 +182,9 @@
         
         self.currentTimestamp.text =  [_dateFormatter stringFromDate:result[@"dt"]];
         
-        self.weather.text = result[@"weather"][0][@"description"];        
+        self.weather.text = result[@"weather"][0][@"description"];
         
+                
     }];
     
     [_weatherAPI forecastWeatherByCoordinate: newLocation.coordinate withCallback:^(NSError *error, NSDictionary *result) {
@@ -121,9 +200,6 @@
         [_locationManager stopUpdatingLocation];
             
     }];
-    
-   
-        
 }
 
 #pragma mark - tableview datasource

@@ -15,6 +15,7 @@
 #import "MMDrawerBarButtonItem.h"
 #import "MMDrawerController.h"
 #import "UIViewController+MMDrawerController.h"
+#import "WeatherViewController.h"
 
 @interface SearchViewController () <UIAlertViewDelegate>
 
@@ -47,14 +48,8 @@
     _mapView.showsUserLocation = NO;
     MMDrawerBarButtonItem * leftDrawerButton = [[MMDrawerBarButtonItem alloc] initWithTarget:self action:@selector(leftDrawerButtonPress:)];
     [self.navigationItem setLeftBarButtonItem:leftDrawerButton animated:YES]; 
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Show" style:UIBarButtonItemStyleBordered target:self action:@selector(showWeather:)];
-    
-    UIButton *buttonShow = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    buttonShow.frame = CGRectMake(260.0f, 7.0f, 54.0f, 32.0f);
-    [buttonShow setTitle:@"Home" forState:UIControlStateNormal];
-    [buttonShow addTarget:self action:@selector(showCurrentLocation:) forControlEvents:UIControlEventTouchDown];
-    [self.view addSubview:buttonShow];
-    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Home" style:UIBarButtonItemStyleBordered target:self action:@selector(showCurrentLocation:)];
+           
     _textField.returnKeyType = UIReturnKeySearch;
     
     
@@ -113,11 +108,6 @@
 
 }
 
-- (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
-{
-    [_textField endEditing:YES];
-}
-
 - (void)showCurrentLocation:(UIButton*)sender {
     
     [_locationManager startUpdatingLocation];
@@ -125,53 +115,7 @@
     [self.view endEditing:YES];
 }
 
-- (void) showWeather: (UIButton*) sender {
-    NSLog(@"%@", _textField.text);
-    if(![self findWithCityName:_textField.text] && ![_textField.text isEqualToString:@""])
-    {
-        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Oops" message:@"City name is not correct" delegate:self cancelButtonTitle:@"Try again" otherButtonTitles: @"History", nil];
-        alert.tag = 0;
-        [alert show];
-                
-    }
-    else
-    {        
-        AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
-        NSManagedObjectContext *context = appDelegate.managedObjectContext;
-        WeatherInfo* newWeatherInfo = [NSEntityDescription insertNewObjectForEntityForName:@"WeatherInfo" inManagedObjectContext:context];
-        
-        newWeatherInfo.city = [_parsedDictionary objectForKey:@"name"];
-        newWeatherInfo.clouds = [NSString stringWithFormat:@"Clouds: %@%%",[[_parsedDictionary objectForKey:@"clouds"] objectForKey:@"all"]];
-        newWeatherInfo.wind = [NSString stringWithFormat:@"Wind: %@ mps", [[_parsedDictionary objectForKey:@"wind"] objectForKey:@"speed"]];
-        newWeatherInfo.humidity = [NSString stringWithFormat:@"Humidity: %@%%", [[_parsedDictionary objectForKey:@"main"] objectForKey:@"humidity"]];
-        NSNumber *temperature = [[_parsedDictionary objectForKey:@"main"] objectForKey:@"temp"];    
-        [NSString stringWithFormat:@"temperature = %.0f ºC", [temperature floatValue] - 273.15f];
-        newWeatherInfo.temperature = [NSString stringWithFormat:@"%.0f", [temperature floatValue] - 273.15f];
-        newWeatherInfo.pressure = [NSString stringWithFormat:@"Pressure: %@hPa", [[_parsedDictionary objectForKey:@"main"] objectForKey:@"pressure"]];
-        newWeatherInfo.timeStamp = [NSDate date];
-        
-        
-        NSString *filter = [NSString stringWithFormat:@"city like \"%@\"", [_parsedDictionary objectForKey:@"name"]];
-        NSArray *entities = [WeatherInfo findAllSortedBy:@"city" ascending:NO withPredicate:[NSPredicate predicateWithFormat:filter] inContext:context];
-        NSLog(@"%@", entities);
-        WeatherInfo *info = [entities objectAtIndex:0];
-        NSLog(@"%@", info.city);
-        
 
-        
-        NSError *error;
-        if (![context save:&error]) {
-            NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
-        }
-        
-        
-        UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
-        UINavigationController * navigationController = [[UINavigationController alloc] initWithRootViewController:[storyboard instantiateViewControllerWithIdentifier:@"History"]];        
-        [self.mm_drawerController setCenterViewController:navigationController withCloseAnimation:YES completion:nil];
-    }
-
-
-}
 
 - (void)openAnnotation:(id)annotation;
 {
@@ -270,6 +214,50 @@
 {
     textField.text = @"";
     return YES;
+}
+
+#pragma mark - MKMapViewDelegate methods 
+
+- (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
+{
+    [_textField endEditing:YES];
+}
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation
+{
+    static NSString* annotationIdentifier = @"annotationIdentifier";
+    MKPinAnnotationView* annotationView = (MKPinAnnotationView *)[mapView
+                                                                  dequeueReusableAnnotationViewWithIdentifier:
+                                                                  annotationIdentifier];
+    if (!annotationView) {
+        annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation
+                                                          reuseIdentifier:nil];
+    }
+    
+    [annotationView setPinColor:MKPinAnnotationColorRed];
+    [annotationView setPinColor:MKPinAnnotationColorGreen];
+    annotationView.animatesDrop = YES;
+    annotationView.canShowCallout = YES;
+    annotationView.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+    
+    return annotationView;
+}
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
+{
+    Annotation *annotationTapped = (Annotation *)view.annotation;
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
+    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    
+    
+    if (![annotationTapped.title isEqualToString:@"Current location"])
+    {
+        appDelegate.cityName = annotationTapped.title;
+    }
+    
+    UINavigationController * navigationController = [[UINavigationController alloc] initWithRootViewController:[storyboard instantiateViewControllerWithIdentifier:@"Weather"]];
+    [self.mm_drawerController setCenterViewController:navigationController withCloseAnimation:YES completion:nil];
+    
 }
 
 

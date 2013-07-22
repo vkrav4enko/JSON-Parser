@@ -259,14 +259,6 @@
                         <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="City name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GLP-3t-ESv">
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="280" id="pnO-GZ-zI3"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="00℃" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VY0-3R-CVa">
                                 <constraints>
                                     <constraint firstAttribute="height" constant="183" id="Djz-PG-Sbt"/>
@@ -277,15 +269,11 @@
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="timestamp" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JIq-Td-EID">
                                 <constraints>
+                                    <constraint firstAttribute="width" constant="280" id="Y9a-Vh-nfh"/>
                                     <constraint firstAttribute="height" constant="21" id="n4C-We-egE"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <color key="textColor" white="0.5" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="weather" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Zx2-Kk-JOR">
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="ccj-ee-G5S">
@@ -301,35 +289,51 @@
                                     <outlet property="delegate" destination="lK0-Sv-gXu" id="cZA-vC-tGW"/>
                                 </connections>
                             </tableView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Weather" textAlignment="right" translatesAutoresizingMaskIntoConstraints="NO" id="O0N-FU-cDj">
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="146" id="hny-sL-DaI"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="City Name" translatesAutoresizingMaskIntoConstraints="NO" id="8E8-Rd-90t">
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="58" id="ZXV-FW-2Mi"/>
+                                    <constraint firstAttribute="width" constant="144" id="oUm-cX-jyY"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="Zx2-Kk-JOR" firstAttribute="trailing" secondItem="GLP-3t-ESv" secondAttribute="trailing" type="default" id="2mV-5w-bcC"/>
+                            <constraint firstItem="8E8-Rd-90t" firstAttribute="leading" secondItem="VY0-3R-CVa" secondAttribute="leading" type="default" id="0ro-FR-eXH"/>
+                            <constraint firstItem="VY0-3R-CVa" firstAttribute="trailing" secondItem="JIq-Td-EID" secondAttribute="trailing" type="default" id="2De-jt-7eI"/>
+                            <constraint firstItem="VY0-3R-CVa" firstAttribute="leading" secondItem="JIq-Td-EID" secondAttribute="leading" type="default" id="4ra-m1-8fJ"/>
+                            <constraint firstItem="ccj-ee-G5S" firstAttribute="bottom" secondItem="JIq-Td-EID" secondAttribute="bottom" type="default" id="7e9-TJ-hm5"/>
                             <constraint firstItem="BST-c2-7Xk" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="238" id="ABo-Vi-Z6x"/>
-                            <constraint firstItem="JIq-Td-EID" firstAttribute="trailing" secondItem="Zx2-Kk-JOR" secondAttribute="trailing" type="default" id="ALZ-tj-w0l"/>
-                            <constraint firstItem="Zx2-Kk-JOR" firstAttribute="leading" secondItem="GLP-3t-ESv" secondAttribute="leading" type="default" id="M79-00-8YN"/>
-                            <constraint firstItem="GLP-3t-ESv" firstAttribute="leading" secondItem="JIq-Td-EID" secondAttribute="leading" type="default" id="Mmi-91-YBd"/>
-                            <constraint firstItem="GLP-3t-ESv" firstAttribute="leading" secondItem="zfj-2E-O2O" secondAttribute="leading" constant="14" id="T1u-cT-pwA"/>
-                            <constraint firstItem="VY0-3R-CVa" firstAttribute="leading" secondItem="Zx2-Kk-JOR" secondAttribute="leading" type="default" id="VTu-5Y-b86"/>
+                            <constraint firstItem="8E8-Rd-90t" firstAttribute="leading" secondItem="zfj-2E-O2O" secondAttribute="leading" constant="14" id="Hiu-EG-cMt"/>
+                            <constraint firstItem="8E8-Rd-90t" firstAttribute="bottom" secondItem="O0N-FU-cDj" secondAttribute="bottom" type="default" id="MqX-j5-Ej5"/>
+                            <constraint firstAttribute="trailing" secondItem="O0N-FU-cDj" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="ZBq-3i-mZ8"/>
                             <constraint firstItem="ccj-ee-G5S" firstAttribute="centerX" secondItem="JIq-Td-EID" secondAttribute="centerX" type="default" id="Zuk-Xw-EoL"/>
-                            <constraint firstItem="GLP-3t-ESv" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="20" symbolic="YES" type="default" id="hND-l9-FPP"/>
-                            <constraint firstItem="VY0-3R-CVa" firstAttribute="bottom" secondItem="JIq-Td-EID" secondAttribute="bottom" type="default" id="htD-Jk-GOo"/>
-                            <constraint firstItem="VY0-3R-CVa" firstAttribute="trailing" secondItem="Zx2-Kk-JOR" secondAttribute="trailing" type="default" id="iiz-GA-x7L"/>
+                            <constraint firstItem="VY0-3R-CVa" firstAttribute="baseline" secondItem="JIq-Td-EID" secondAttribute="baseline" type="default" id="dQm-eR-raa"/>
+                            <constraint firstItem="8E8-Rd-90t" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="14" id="e0Z-CV-ZUD"/>
                             <constraint firstItem="BST-c2-7Xk" firstAttribute="leading" secondItem="zfj-2E-O2O" secondAttribute="leading" type="default" id="kze-XL-fJL"/>
                             <constraint firstItem="BST-c2-7Xk" firstAttribute="trailing" secondItem="zfj-2E-O2O" secondAttribute="trailing" type="default" id="lmk-zO-SfZ"/>
-                            <constraint firstItem="VY0-3R-CVa" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="20" symbolic="YES" type="default" id="nqq-1v-S6N"/>
-                            <constraint firstItem="Zx2-Kk-JOR" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="20" symbolic="YES" type="default" id="pnT-XH-X2P"/>
-                            <constraint firstItem="ccj-ee-G5S" firstAttribute="bottom" secondItem="VY0-3R-CVa" secondAttribute="bottom" type="default" id="vGN-ky-YJg"/>
+                            <constraint firstItem="8E8-Rd-90t" firstAttribute="top" secondItem="O0N-FU-cDj" secondAttribute="top" type="default" id="uZD-th-TH6"/>
+                            <constraint firstItem="VY0-3R-CVa" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="34" id="uhu-be-tJy"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Sx4-6s-HjZ"/>
                     <connections>
                         <outlet property="activityIndicator" destination="ccj-ee-G5S" id="GCQ-NL-pb1"/>
-                        <outlet property="cityName" destination="GLP-3t-ESv" id="Vg8-HN-a5u"/>
+                        <outlet property="cityName" destination="8E8-Rd-90t" id="lns-BN-s1B"/>
                         <outlet property="currentTemp" destination="VY0-3R-CVa" id="1OO-xy-CmR"/>
                         <outlet property="currentTimestamp" destination="JIq-Td-EID" id="5yM-sv-Cjs"/>
                         <outlet property="forecastTableView" destination="BST-c2-7Xk" id="Tuu-EB-dOx"/>
-                        <outlet property="weather" destination="Zx2-Kk-JOR" id="hBC-re-hGZ"/>
+                        <outlet property="weather" destination="O0N-FU-cDj" id="3Ab-tt-53v"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="WUd-93-keI" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -395,11 +399,11 @@
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WeatherViewController.h"/>
             <relationships>
                 <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
-                <relationship kind="outlet" name="cityName" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="cityName" candidateClass="UITextView"/>
                 <relationship kind="outlet" name="currentTemp" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="currentTimestamp" candidateClass="UILabel"/>
                 <relationship kind="outlet" name="forecastTableView" candidateClass="UITableView"/>
-                <relationship kind="outlet" name="weather" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="weather" candidateClass="UITextView"/>
             </relationships>
         </class>
     </classes>
