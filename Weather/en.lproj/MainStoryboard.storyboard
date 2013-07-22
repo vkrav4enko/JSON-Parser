@@ -16,6 +16,9 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="505" id="h9s-KG-p59"/>
                                 </constraints>
+                                <connections>
+                                    <outlet property="delegate" destination="2" id="6Vi-UD-0Nt"/>
+                                </connections>
                             </mapView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -45,14 +48,14 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="171" y="643"/>
+            <point key="canvasLocation" x="800" y="-40"/>
         </scene>
         <!--History View Controller - Root View Controller-->
         <scene sceneID="hoc-Ub-BrZ">
             <objects>
                 <tableViewController storyboardIdentifier="History" id="KdM-tq-J8h" customClass="HistoryViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="bB5-PH-ZDR">
-                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
@@ -89,7 +92,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FEy-XR-0Fm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="171" y="-40"/>
+            <point key="canvasLocation" x="-280" y="-40"/>
         </scene>
         <!--Graph View Controller-->
         <scene sceneID="iGL-EN-ydA">
@@ -120,7 +123,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Vwr-6W-cet" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="715" y="-449"/>
+            <point key="canvasLocation" x="264" y="-449"/>
         </scene>
         <!--Menu View Controller-->
         <scene sceneID="gqP-cL-6ux">
@@ -161,14 +164,14 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1SP-Cb-dme" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-285" y="643"/>
+            <point key="canvasLocation" x="-273" y="644"/>
         </scene>
         <!--History Detail View Controller-->
         <scene sceneID="rOZ-SO-xkU">
             <objects>
                 <viewController storyboardIdentifier="" id="YOv-If-MQi" customClass="HistoryDetailViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Axy-WY-srQ">
-                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Ul-tk-IAl">
@@ -246,75 +249,92 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="goM-S1-u3O" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="715" y="-40"/>
+            <point key="canvasLocation" x="264" y="-40"/>
         </scene>
         <!--Weather View Controller-->
         <scene sceneID="8Cs-G7-xc3">
             <objects>
                 <viewController storyboardIdentifier="Weather" id="lK0-Sv-gXu" customClass="WeatherViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="zfj-2E-O2O">
-                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dhk-zk-8IX">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="City name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GLP-3t-ESv">
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="230" id="3S6-Nb-qnB"/>
+                                    <constraint firstAttribute="width" constant="280" id="pnO-GZ-zI3"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XGj-BD-O2H">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="00℃" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VY0-3R-CVa">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="183" id="Djz-PG-Sbt"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="75"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="timestamp" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JIq-Td-EID">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="n4C-We-egE"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <color key="textColor" white="0.5" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="weather" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Zx2-Kk-JOR">
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6CE-K6-vIz">
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="akL-jU-ory">
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qWe-zX-TLP">
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="721-fo-ITK">
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="ccj-ee-G5S">
+                                <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            </activityIndicatorView>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="BST-c2-7Xk">
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="300" id="09F-bZ-qK1"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="dataSource" destination="lK0-Sv-gXu" id="NKx-u8-RLo"/>
+                                    <outlet property="delegate" destination="lK0-Sv-gXu" id="cZA-vC-tGW"/>
+                                </connections>
+                            </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="qWe-zX-TLP" firstAttribute="leading" secondItem="721-fo-ITK" secondAttribute="leading" type="default" id="0Hc-zg-VYz"/>
-                            <constraint firstItem="qWe-zX-TLP" firstAttribute="trailing" secondItem="721-fo-ITK" secondAttribute="trailing" type="default" id="7Rl-oK-UTO"/>
-                            <constraint firstItem="qWe-zX-TLP" firstAttribute="top" secondItem="akL-jU-ory" secondAttribute="bottom" constant="8" symbolic="YES" type="default" id="AZr-uy-3hf"/>
-                            <constraint firstItem="6CE-K6-vIz" firstAttribute="leading" secondItem="XGj-BD-O2H" secondAttribute="leading" type="default" id="BU6-TV-yc8"/>
-                            <constraint firstItem="6CE-K6-vIz" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="109" id="Hem-aV-RfQ"/>
-                            <constraint firstItem="akL-jU-ory" firstAttribute="centerX" secondItem="zfj-2E-O2O" secondAttribute="centerX" type="default" id="MEn-ac-QSC"/>
-                            <constraint firstItem="XGj-BD-O2H" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="79" id="MyK-cj-5y1"/>
-                            <constraint firstItem="Dhk-zk-8IX" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="51" id="NSW-D3-KyB"/>
-                            <constraint firstItem="721-fo-ITK" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="196" id="PdO-XO-OB3"/>
-                            <constraint firstItem="akL-jU-ory" firstAttribute="trailing" secondItem="6CE-K6-vIz" secondAttribute="trailing" type="default" id="ReG-TY-Hbe"/>
-                            <constraint firstItem="XGj-BD-O2H" firstAttribute="trailing" secondItem="6CE-K6-vIz" secondAttribute="trailing" type="default" id="ZzU-le-lSH"/>
-                            <constraint firstItem="akL-jU-ory" firstAttribute="trailing" secondItem="qWe-zX-TLP" secondAttribute="trailing" type="default" id="akm-XC-rTe"/>
-                            <constraint firstItem="akL-jU-ory" firstAttribute="leading" secondItem="qWe-zX-TLP" secondAttribute="leading" type="default" id="d8r-Zf-BzT"/>
-                            <constraint firstItem="XGj-BD-O2H" firstAttribute="leading" secondItem="Dhk-zk-8IX" secondAttribute="leading" type="default" id="fdD-yr-lQq"/>
-                            <constraint firstItem="akL-jU-ory" firstAttribute="leading" secondItem="6CE-K6-vIz" secondAttribute="leading" type="default" id="irC-TA-vxK"/>
-                            <constraint firstItem="XGj-BD-O2H" firstAttribute="trailing" secondItem="Dhk-zk-8IX" secondAttribute="trailing" type="default" id="jfN-8h-fT0"/>
-                            <constraint firstItem="akL-jU-ory" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="137" id="zlL-8Q-CSE"/>
+                            <constraint firstItem="Zx2-Kk-JOR" firstAttribute="trailing" secondItem="GLP-3t-ESv" secondAttribute="trailing" type="default" id="2mV-5w-bcC"/>
+                            <constraint firstItem="BST-c2-7Xk" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="238" id="ABo-Vi-Z6x"/>
+                            <constraint firstItem="JIq-Td-EID" firstAttribute="trailing" secondItem="Zx2-Kk-JOR" secondAttribute="trailing" type="default" id="ALZ-tj-w0l"/>
+                            <constraint firstItem="Zx2-Kk-JOR" firstAttribute="leading" secondItem="GLP-3t-ESv" secondAttribute="leading" type="default" id="M79-00-8YN"/>
+                            <constraint firstItem="GLP-3t-ESv" firstAttribute="leading" secondItem="JIq-Td-EID" secondAttribute="leading" type="default" id="Mmi-91-YBd"/>
+                            <constraint firstItem="GLP-3t-ESv" firstAttribute="leading" secondItem="zfj-2E-O2O" secondAttribute="leading" constant="14" id="T1u-cT-pwA"/>
+                            <constraint firstItem="VY0-3R-CVa" firstAttribute="leading" secondItem="Zx2-Kk-JOR" secondAttribute="leading" type="default" id="VTu-5Y-b86"/>
+                            <constraint firstItem="ccj-ee-G5S" firstAttribute="centerX" secondItem="JIq-Td-EID" secondAttribute="centerX" type="default" id="Zuk-Xw-EoL"/>
+                            <constraint firstItem="GLP-3t-ESv" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="20" symbolic="YES" type="default" id="hND-l9-FPP"/>
+                            <constraint firstItem="VY0-3R-CVa" firstAttribute="bottom" secondItem="JIq-Td-EID" secondAttribute="bottom" type="default" id="htD-Jk-GOo"/>
+                            <constraint firstItem="VY0-3R-CVa" firstAttribute="trailing" secondItem="Zx2-Kk-JOR" secondAttribute="trailing" type="default" id="iiz-GA-x7L"/>
+                            <constraint firstItem="BST-c2-7Xk" firstAttribute="leading" secondItem="zfj-2E-O2O" secondAttribute="leading" type="default" id="kze-XL-fJL"/>
+                            <constraint firstItem="BST-c2-7Xk" firstAttribute="trailing" secondItem="zfj-2E-O2O" secondAttribute="trailing" type="default" id="lmk-zO-SfZ"/>
+                            <constraint firstItem="VY0-3R-CVa" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="20" symbolic="YES" type="default" id="nqq-1v-S6N"/>
+                            <constraint firstItem="Zx2-Kk-JOR" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="20" symbolic="YES" type="default" id="pnT-XH-X2P"/>
+                            <constraint firstItem="ccj-ee-G5S" firstAttribute="bottom" secondItem="VY0-3R-CVa" secondAttribute="bottom" type="default" id="vGN-ky-YJg"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="Sx4-6s-HjZ"/>
+                    <connections>
+                        <outlet property="activityIndicator" destination="ccj-ee-G5S" id="GCQ-NL-pb1"/>
+                        <outlet property="cityName" destination="GLP-3t-ESv" id="Vg8-HN-a5u"/>
+                        <outlet property="currentTemp" destination="VY0-3R-CVa" id="1OO-xy-CmR"/>
+                        <outlet property="currentTimestamp" destination="JIq-Td-EID" id="5yM-sv-Cjs"/>
+                        <outlet property="forecastTableView" destination="BST-c2-7Xk" id="Tuu-EB-dOx"/>
+                        <outlet property="weather" destination="Zx2-Kk-JOR" id="hBC-re-hGZ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="WUd-93-keI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="715" y="643"/>
+            <point key="canvasLocation" x="795" y="644"/>
         </scene>
         <!--Navigation Controller - Item-->
         <scene sceneID="Yl2-ZG-9gH">
@@ -325,12 +345,12 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="KdM-tq-J8h" kind="relationship" relationship="rootViewController" id="oJ2-Tw-Utu"/>
+                        <segue destination="lK0-Sv-gXu" kind="relationship" relationship="rootViewController" id="BN4-ze-sZP"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pgh-Af-NqM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-260" y="-40"/>
+            <point key="canvasLocation" x="264" y="644"/>
         </scene>
     </scenes>
     <classes>
@@ -343,14 +363,44 @@
                 <relationship kind="outlet" name="hostView" candidateClass="CPTGraphHostingView"/>
             </relationships>
         </class>
+        <class className="HistoryDetailViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/HistoryDetailViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="city" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="cloud" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="hostView" candidateClass="CPTGraphHostingView"/>
+                <relationship kind="outlet" name="humidity" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="presure" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="temp" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="wind" candidateClass="UILabel"/>
+            </relationships>
+        </class>
+        <class className="HistoryViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/HistoryViewController.h"/>
+        </class>
         <class className="MenuViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/MenuViewController.h"/>
         </class>
         <class className="NSLayoutConstraint" superclassName="NSObject">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
         </class>
+        <class className="SearchViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/SearchViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="mapView" candidateClass="MKMapView"/>
+                <relationship kind="outlet" name="textField" candidateClass="UITextField"/>
+            </relationships>
+        </class>
         <class className="WeatherViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WeatherViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="activityIndicator" candidateClass="UIActivityIndicatorView"/>
+                <relationship kind="outlet" name="cityName" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="currentTemp" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="currentTimestamp" candidateClass="UILabel"/>
+                <relationship kind="outlet" name="forecastTableView" candidateClass="UITableView"/>
+                <relationship kind="outlet" name="weather" candidateClass="UILabel"/>
+            </relationships>
         </class>
     </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

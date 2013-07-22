@@ -11,7 +11,7 @@
 #import <MapKit/MapKit.h>
 
 
-@interface SearchViewController : UIViewController <CLLocationManagerDelegate,UITextFieldDelegate>
+@interface SearchViewController : UIViewController <CLLocationManagerDelegate,UITextFieldDelegate, MKMapViewDelegate>
 
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 @property (nonatomic, strong) CLLocationManager* locationManager;

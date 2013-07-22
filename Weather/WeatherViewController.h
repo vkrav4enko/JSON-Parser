@@ -7,7 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
 
-@interface WeatherViewController : UIViewController
+@interface WeatherViewController : UIViewController <CLLocationManagerDelegate, UITableViewDataSource>
+@property (nonatomic, strong) CLLocationManager* locationManager;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
+@property (weak, nonatomic) IBOutlet UILabel *cityName;
+@property (weak, nonatomic) IBOutlet UILabel *currentTemp;
+@property (weak, nonatomic) IBOutlet UITableView *forecastTableView;
+@property (weak, nonatomic) IBOutlet UILabel *currentTimestamp;
+@property (weak, nonatomic) IBOutlet UILabel *weather;
+
 
 @end

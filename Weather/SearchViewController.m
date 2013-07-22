@@ -47,7 +47,17 @@
     _mapView.showsUserLocation = NO;
     MMDrawerBarButtonItem * leftDrawerButton = [[MMDrawerBarButtonItem alloc] initWithTarget:self action:@selector(leftDrawerButtonPress:)];
     [self.navigationItem setLeftBarButtonItem:leftDrawerButton animated:YES]; 
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Home" style:UIBarButtonItemStyleBordered target:self action:@selector(showCurrentLocation:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Show" style:UIBarButtonItemStyleBordered target:self action:@selector(showWeather:)];
+    
+    UIButton *buttonShow = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    buttonShow.frame = CGRectMake(260.0f, 7.0f, 54.0f, 32.0f);
+    [buttonShow setTitle:@"Home" forState:UIControlStateNormal];
+    [buttonShow addTarget:self action:@selector(showCurrentLocation:) forControlEvents:UIControlEventTouchDown];
+    [self.view addSubview:buttonShow];
+    
+    _textField.returnKeyType = UIReturnKeySearch;
+    
+    
 //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Show" style:UIBarButtonItemStyleBordered target:self action:@selector(showWeather:)];
 }
 
@@ -103,6 +113,11 @@
 
 }
 
+- (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
+{
+    [_textField endEditing:YES];
+}
+
 - (void)showCurrentLocation:(UIButton*)sender {
     
     [_locationManager startUpdatingLocation];
@@ -114,7 +129,7 @@
     NSLog(@"%@", _textField.text);
     if(![self findWithCityName:_textField.text] && ![_textField.text isEqualToString:@""])
     {
-        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Oops" message:@"City name is not correct" delegate:self cancelButtonTitle:@"Try again" otherButtonTitles: @"I don't care", nil];
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Oops" message:@"City name is not correct" delegate:self cancelButtonTitle:@"Try again" otherButtonTitles: @"History", nil];
         alert.tag = 0;
         [alert show];
                 
@@ -149,25 +164,12 @@
             NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
         }
         
-        [self.tabBarController setSelectedIndex:1];
+        
+        UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
+        UINavigationController * navigationController = [[UINavigationController alloc] initWithRootViewController:[storyboard instantiateViewControllerWithIdentifier:@"History"]];        
+        [self.mm_drawerController setCenterViewController:navigationController withCloseAnimation:YES completion:nil];
     }
 
-
-}
-
-
-
-- (MKAnnotationView *) mapView:(MKMapView *)map viewForAnnotation:(id <MKAnnotation>)annotation
-{
-    static NSString *pinID = @"mapPin";
-    MKAnnotationView *pinAnnotation = nil;
-    pinAnnotation = (MKAnnotationView *)[_mapView dequeueReusableAnnotationViewWithIdentifier:pinID];
-    if (pinAnnotation == nil)
-        pinAnnotation = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:pinID] ;
-    
-    pinAnnotation.canShowCallout = YES;
-    return pinAnnotation;
-    
 
 }
 
@@ -251,13 +253,16 @@
         if (buttonIndex == 0)
         {
             [self showCurrentLocation:nil];
-            [self.tabBarController setSelectedIndex:0];
-            [_textField becomeFirstResponder];
+            _textField.text = @"";
             
         }
         else
-            [self.tabBarController setSelectedIndex:1];
-              
+        {
+            UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
+            UINavigationController * navigationController = [[UINavigationController alloc] initWithRootViewController:[storyboard instantiateViewControllerWithIdentifier:@"History"]];
+            [self.mm_drawerController setCenterViewController:navigationController withCloseAnimation:YES completion:nil];
+        }
+        
     }
 }
 

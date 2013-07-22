@@ -22,7 +22,6 @@
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
     UIViewController * leftSideDrawerViewController = [storyboard instantiateViewControllerWithIdentifier:@"Menu"];
     
-    
     _drawerController = [[MMDrawerController alloc]
                                              initWithCenterViewController:[storyboard instantiateInitialViewController]
                                              leftDrawerViewController:leftSideDrawerViewController];
@@ -167,6 +166,17 @@
 @end
 
 
+@implementation MMDrawerController (rotate)
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown);
+}
+
+- (NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
+}
+@end
 
 
 
