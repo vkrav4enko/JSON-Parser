@@ -11,10 +11,10 @@
 #import "MMDrawerController.h"
 #import "UIViewController+MMDrawerController.h"
 #import "OWMWeatherAPI.h"
-#import "SearchViewController.h"
 #import "AppDelegate.h"
 #import "WeatherInfo.h"
 #import "NSManagedObject+ActiveRecord.h"
+#import "MBProgressHUD.h"
 
 @interface WeatherViewController ()
 
@@ -55,7 +55,7 @@
     
     self.title = @"Current weather";
     
-    [_activityIndicator startAnimating];
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     
     
     _locationManager = [CLLocationManager new];
@@ -102,7 +102,7 @@
             
             _forecast = result[@"list"];
             [self.forecastTableView reloadData];
-            [self.activityIndicator stopAnimating];
+            [MBProgressHUD hideHUDForView:self.view animated:YES];
             [_locationManager stopUpdatingLocation];
             
         }];
@@ -111,7 +111,7 @@
     else
     {
         [_locationManager startUpdatingLocation];
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Detail" style:UIBarButtonItemStyleBordered target:self action:@selector(showDetail:)];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Details" style:UIBarButtonItemStyleBordered target:self action:@selector(showDetail:)];
     }
 }
 
@@ -165,7 +165,7 @@
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
-{    
+{
     [_weatherAPI currentWeatherByCoordinate:newLocation.coordinate withCallback:^(NSError *error, NSDictionary *result) {
         if (error) {
             NSLog(@"OpenWeatherApi error:");
@@ -196,8 +196,9 @@
         
         _forecast = result[@"list"];
         [self.forecastTableView reloadData];
-        [self.activityIndicator stopAnimating];
+        
         [_locationManager stopUpdatingLocation];
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
             
     }];
 }

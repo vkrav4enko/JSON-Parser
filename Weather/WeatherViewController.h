@@ -11,7 +11,6 @@
 
 @interface WeatherViewController : UIViewController <CLLocationManagerDelegate, UITableViewDataSource>
 @property (nonatomic, strong) CLLocationManager* locationManager;
-@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property (weak, nonatomic) IBOutlet UITextView *cityName;
 @property (weak, nonatomic) IBOutlet UILabel *currentTemp;
 @property (weak, nonatomic) IBOutlet UITableView *forecastTableView;

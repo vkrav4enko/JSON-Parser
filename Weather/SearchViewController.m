@@ -15,7 +15,8 @@
 #import "MMDrawerBarButtonItem.h"
 #import "MMDrawerController.h"
 #import "UIViewController+MMDrawerController.h"
-#import "WeatherViewController.h"
+
+
 
 @interface SearchViewController () <UIAlertViewDelegate>
 
@@ -43,7 +44,6 @@
                                         repeats:YES];
         
     }
-    
     [self showCurrentLocation:nil];
     _mapView.showsUserLocation = NO;
     MMDrawerBarButtonItem * leftDrawerButton = [[MMDrawerBarButtonItem alloc] initWithTarget:self action:@selector(leftDrawerButtonPress:)];
@@ -78,7 +78,7 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
-    [_mapView removeAnnotations:_mapView.annotations];
+    [_mapView removeAnnotations:_mapView.annotations];      
     NSString *strURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f", newLocation.coordinate.latitude, newLocation.coordinate.longitude];
     
     NSString *weather  = [NSString stringWithContentsOfURL:[NSURL URLWithString:strURL] encoding:NSUTF8StringEncoding error:nil];

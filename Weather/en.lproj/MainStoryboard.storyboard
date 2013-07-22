@@ -276,9 +276,6 @@
                                 <color key="textColor" white="0.5" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="ccj-ee-G5S">
-                                <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                            </activityIndicatorView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="BST-c2-7Xk">
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
@@ -312,12 +309,10 @@
                             <constraint firstItem="8E8-Rd-90t" firstAttribute="leading" secondItem="VY0-3R-CVa" secondAttribute="leading" type="default" id="0ro-FR-eXH"/>
                             <constraint firstItem="VY0-3R-CVa" firstAttribute="trailing" secondItem="JIq-Td-EID" secondAttribute="trailing" type="default" id="2De-jt-7eI"/>
                             <constraint firstItem="VY0-3R-CVa" firstAttribute="leading" secondItem="JIq-Td-EID" secondAttribute="leading" type="default" id="4ra-m1-8fJ"/>
-                            <constraint firstItem="ccj-ee-G5S" firstAttribute="bottom" secondItem="JIq-Td-EID" secondAttribute="bottom" type="default" id="7e9-TJ-hm5"/>
                             <constraint firstItem="BST-c2-7Xk" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="238" id="ABo-Vi-Z6x"/>
                             <constraint firstItem="8E8-Rd-90t" firstAttribute="leading" secondItem="zfj-2E-O2O" secondAttribute="leading" constant="14" id="Hiu-EG-cMt"/>
                             <constraint firstItem="8E8-Rd-90t" firstAttribute="bottom" secondItem="O0N-FU-cDj" secondAttribute="bottom" type="default" id="MqX-j5-Ej5"/>
                             <constraint firstAttribute="trailing" secondItem="O0N-FU-cDj" secondAttribute="trailing" constant="20" symbolic="YES" type="default" id="ZBq-3i-mZ8"/>
-                            <constraint firstItem="ccj-ee-G5S" firstAttribute="centerX" secondItem="JIq-Td-EID" secondAttribute="centerX" type="default" id="Zuk-Xw-EoL"/>
                             <constraint firstItem="VY0-3R-CVa" firstAttribute="baseline" secondItem="JIq-Td-EID" secondAttribute="baseline" type="default" id="dQm-eR-raa"/>
                             <constraint firstItem="8E8-Rd-90t" firstAttribute="top" secondItem="zfj-2E-O2O" secondAttribute="top" constant="14" id="e0Z-CV-ZUD"/>
                             <constraint firstItem="BST-c2-7Xk" firstAttribute="leading" secondItem="zfj-2E-O2O" secondAttribute="leading" type="default" id="kze-XL-fJL"/>
@@ -328,7 +323,6 @@
                     </view>
                     <navigationItem key="navigationItem" id="Sx4-6s-HjZ"/>
                     <connections>
-                        <outlet property="activityIndicator" destination="ccj-ee-G5S" id="GCQ-NL-pb1"/>
                         <outlet property="cityName" destination="8E8-Rd-90t" id="lns-BN-s1B"/>
                         <outlet property="currentTemp" destination="VY0-3R-CVa" id="1OO-xy-CmR"/>
                         <outlet property="currentTimestamp" destination="JIq-Td-EID" id="5yM-sv-Cjs"/>
