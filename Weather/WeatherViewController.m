@@ -53,7 +53,8 @@
     _forecast = @[];
     _weatherAPI = [[OWMWeatherAPI alloc] initWithAPIKey:@"Weather"];
     
-    self.title = @"Current weather";
+    self.title = @"Weather";
+    
     
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     
@@ -74,7 +75,8 @@
     NSLog(@"%@",_cityName.text);
     
     if (![_cityName.text isEqualToString:@""])
-    {        
+    {
+        self.title = _cityName.text;
         [_weatherAPI currentWeatherByCityName:_cityName.text withCallback:^(NSError *error, NSDictionary *result) {
             if (error) {
                 NSLog(@"OpenWeatherApi error:");
@@ -84,7 +86,7 @@
                                   result[@"name"],
                                   result[@"sys"][@"country"]
                                   ];
-            
+            self.title = _cityName.text;            
             self.currentTemp.text = [NSString stringWithFormat:@"%.1f℃",
                                      [result[@"main"][@"temp"] floatValue] ];
             
@@ -176,6 +178,7 @@
                               result[@"name"],
                               result[@"sys"][@"country"]
                               ];
+        self.navigationItem.prompt = _cityName.text;
         
         self.currentTemp.text = [NSString stringWithFormat:@"%.1f℃",
                                  [result[@"main"][@"temp"] floatValue] ];
