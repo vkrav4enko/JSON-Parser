@@ -121,28 +121,36 @@
     
     AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
     NSManagedObjectContext *context = appDelegate.managedObjectContext;
-    WeatherInfo* newWeatherInfo = [NSEntityDescription insertNewObjectForEntityForName:@"WeatherInfo" inManagedObjectContext:context];
-    newWeatherInfo.city = _result[@"name"];
-    newWeatherInfo.clouds = [NSString stringWithFormat:@"Clouds: %@%%",[[_result objectForKey:@"clouds"] objectForKey:@"all"]];
-    newWeatherInfo.wind = [NSString stringWithFormat:@"Wind: %@ mps", [[_result objectForKey:@"wind"] objectForKey:@"speed"]];
-    newWeatherInfo.humidity = [NSString stringWithFormat:@"Humidity: %@%%", [[_result objectForKey:@"main"] objectForKey:@"humidity"]];
-    NSNumber *temperature = [[_result objectForKey:@"main"] objectForKey:@"temp"];
-    newWeatherInfo.temperature = [NSString stringWithFormat:@"%.0f", [temperature floatValue] ];
-    newWeatherInfo.pressure = [NSString stringWithFormat:@"Pressure: %@hPa", [[_result objectForKey:@"main"] objectForKey:@"pressure"]];
-    newWeatherInfo.timeStamp = [NSDate date];
-    NSString *filter = [NSString stringWithFormat:@"city like \"%@\"", [_result objectForKey:@"name"]];
-    NSArray *entities = [WeatherInfo findAllSortedBy:@"city" ascending:NO withPredicate:[NSPredicate predicateWithFormat:filter] inContext:context];
-    NSLog(@"%@", entities);
-    WeatherInfo *info = [entities objectAtIndex:0];
-    NSLog(@"%@", info.city);
-
-    NSError *saveError;
-    if (![context save:&saveError]) {
-        NSLog(@"Whoops, couldn't save: %@", [saveError localizedDescription]);
-    }
+    
+    RKManagedObjectStore *managedObjectStore = [RKManagedObjectStore defaultStore];
+    RKEntityMapping *entityMapping = [RKEntityMapping mappingForEntityForName:@"WeatherInfo" inManagedObjectStore:managedObjectStore];
+    [entityMapping addAttributeMappingsFromDictionary:@{
+     @"name":          @"city",
+     @"clouds.all":    @"clouds",
+     @"wind.speed":    @"wind",
+     @"main.humidity": @"humidity",
+     @"main.temp":     @"temperature",
+     @"main.pressure": @"pressure",
+     @"dt":            @"timeStamp"}];
+    
+    
+    RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
+    RKResponseDescriptor *responseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:entityMapping method:RKRequestMethodGET pathPattern:nil keyPath:nil statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+    
+    NSString *stringURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f", [_result [@"coord"][@"lat"] floatValue] , [_result [@"coord"][@"lon"] floatValue]];
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString: stringURL]];
+    RKManagedObjectRequestOperation *managedObjectRequestOperation = [[RKManagedObjectRequestOperation alloc] initWithRequest:request responseDescriptors:@[ responseDescriptor ]];
+    managedObjectRequestOperation.managedObjectContext = context;
+    [[NSOperationQueue currentQueue] addOperation:managedObjectRequestOperation];
+    
+    
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
     UINavigationController * navigationController = [[UINavigationController alloc] initWithRootViewController:[storyboard instantiateViewControllerWithIdentifier:@"History"]];
     [self.mm_drawerController setCenterViewController:navigationController withCloseAnimation:YES completion:nil];
+    
+   
+    
+    
 }
 
 -(void)leftDrawerButtonPress:(id)sender{
@@ -199,9 +207,9 @@
         
         _forecast = result[@"list"];
         [self.forecastTableView reloadData];
-        
-        [_locationManager stopUpdatingLocation];
         [MBProgressHUD hideHUDForView:self.view animated:YES];
+        [_locationManager stopUpdatingLocation];
+        
             
     }];
 }

@@ -38,14 +38,13 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(clear)];
     
     AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
-    _managedObjectContext = appDelegate.managedObjectContext;
-    
+    _managedObjectContext = appDelegate.managedObjectContext;    
     
     NSError *error;
 	if (![[self fetchedResultsController] performFetch:&error]) {
 		// Update to handle the error appropriately.
 		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-		exit(-1);  // Fail
+		abort();  // Fail
 	}
    
     // Uncomment the following line to preserve selection between presentations.
@@ -136,7 +135,7 @@
     [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
                                         managedObjectContext:_managedObjectContext
                                           sectionNameKeyPath:@"sectionIdentifier"
-                                                   cacheName:@"Root"];
+                                                   cacheName:nil];
     self.fetchedResultsController = theFetchedResultsController;
     _fetchedResultsController.delegate = self;
     return _fetchedResultsController;

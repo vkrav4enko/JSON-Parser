@@ -128,7 +128,7 @@
     NSMutableArray *newData = [NSMutableArray array];
     NSUInteger dayInHistory;
     
-    for ( dayInHistory = 0; dayInHistory < 10; dayInHistory++ ) {
+    for ( dayInHistory = 0; dayInHistory < 30; dayInHistory++ ) {
         NSDateFormatter *dateFormatter2 = [NSDateFormatter new];
         [dateFormatter2 setDateFormat:@"yyyyMMdd"];        
         NSTimeInterval x = [[NSDate date] timeIntervalSince1970] - oneDay * dayInHistory;
