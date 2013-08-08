@@ -33,6 +33,9 @@
     [managedObjectStore createManagedObjectContexts];
     [RKManagedObjectStore setDefaultStore:managedObjectStore];
     _managedObjectContext = [[RKManagedObjectStore defaultStore] mainQueueManagedObjectContext];
+    NSURL *baseURL = [NSURL URLWithString:@"http://api.openweathermap.org"];
+    RKObjectManager *objectManager = [RKObjectManager managerWithBaseURL:baseURL];
+    objectManager.managedObjectStore = managedObjectStore;
     
     
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];

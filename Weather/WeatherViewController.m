@@ -15,6 +15,7 @@
 #import "WeatherInfo.h"
 #import "NSManagedObject+ActiveRecord.h"
 #import "MBProgressHUD.h"
+#import "Weather.h"
 
 @interface WeatherViewController ()
 
@@ -22,6 +23,9 @@
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, strong) OWMWeatherAPI *weatherAPI;
 @property (nonatomic, strong) NSDictionary *result;
+@property (nonatomic) float lat;
+@property (nonatomic) float lon;
+
 @end
 
 @implementation WeatherViewController
@@ -119,9 +123,6 @@
 
 - (void) showDetail: (id) sender{
     
-    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
-    NSManagedObjectContext *context = appDelegate.managedObjectContext;
-    
     RKManagedObjectStore *managedObjectStore = [RKManagedObjectStore defaultStore];
     RKEntityMapping *entityMapping = [RKEntityMapping mappingForEntityForName:@"WeatherInfo" inManagedObjectStore:managedObjectStore];
     [entityMapping addAttributeMappingsFromDictionary:@{
@@ -132,16 +133,20 @@
      @"main.temp":     @"temperature",
      @"main.pressure": @"pressure",
      @"dt":            @"timeStamp"}];
-    
+     
     
     RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
-    RKResponseDescriptor *responseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:entityMapping method:RKRequestMethodGET pathPattern:nil keyPath:nil statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+    RKResponseDescriptor *responseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:entityMapping method:RKRequestMethodGET pathPattern:@"/data/2.5/:weather" keyPath:nil statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];    
+    [[RKObjectManager sharedManager] addResponseDescriptor:responseDescriptor];
+    NSString *path = [NSString stringWithFormat:@"/data/2.5/weather?lat=%f&lon=%f", _lat , _lon];
+    [[RKObjectManager sharedManager] getObjectsAtPath:path parameters:nil success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {        
+        
+    } failure:^(RKObjectRequestOperation *operation, NSError *error) {
+        
+    }];
     
-    NSString *stringURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f", [_result [@"coord"][@"lat"] floatValue] , [_result [@"coord"][@"lon"] floatValue]];
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString: stringURL]];
-    RKManagedObjectRequestOperation *managedObjectRequestOperation = [[RKManagedObjectRequestOperation alloc] initWithRequest:request responseDescriptors:@[ responseDescriptor ]];
-    managedObjectRequestOperation.managedObjectContext = context;
-    [[NSOperationQueue currentQueue] addOperation:managedObjectRequestOperation];
+    
+    
     
     
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
@@ -176,42 +181,58 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
-    [_weatherAPI currentWeatherByCoordinate:newLocation.coordinate withCallback:^(NSError *error, NSDictionary *result) {
-        if (error) {
-            NSLog(@"OpenWeatherApi error:");
-            return;
-        }
-        _result = result;
-        self.cityName.text = [NSString stringWithFormat:@"%@, %@",
-                              result[@"name"],
-                              result[@"sys"][@"country"]
-                              ];
+    _lat = newLocation.coordinate.latitude;
+    _lon = newLocation.coordinate.longitude;
+    
+    //Current Weather
+    RKObjectMapping *weatherMapping = [RKObjectMapping mappingForClass:[Weather class]];
+    [weatherMapping addAttributeMappingsFromDictionary:
+     @{@"dt": @"timeStamp",
+     @"main.temp": @"temperature",
+     @"weather": @"weatherInfo",
+     @"name": @"city"
+     }];
+    RKResponseDescriptor *weatherResponseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:weatherMapping method:RKRequestMethodGET pathPattern:@"/data/2.5/:weather" keyPath:nil statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+    [[RKObjectManager sharedManager] addResponseDescriptor:weatherResponseDescriptor];
+    NSString *pathWeather = [NSString stringWithFormat:@"/data/2.5/weather?lat=%f&lon=%f", _lat , _lon];
+    [[RKObjectManager sharedManager] getObject:[Weather new] path:pathWeather parameters:nil success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
+        
+        Weather *weather = mappingResult.array [0];
+        self.cityName.text = weather.city;
         self.navigationItem.prompt = _cityName.text;
         
-        self.currentTemp.text = [NSString stringWithFormat:@"%.1f℃",
-                                 [result[@"main"][@"temp"] floatValue] ];
+        self.currentTemp.text = [self stringTemperature:weather.temperature];
         
-        self.currentTimestamp.text =  [_dateFormatter stringFromDate:result[@"dt"]];
+        self.currentTimestamp.text =  [_dateFormatter stringFromDate:weather.timeStamp];
         
-        self.weather.text = result[@"weather"][0][@"description"];
+        self.weather.text = [[weather.weatherInfo objectAtIndex:0] objectForKey:@"description"];
         
-                
+    } failure:^(RKObjectRequestOperation *operation, NSError *error) {
+        RKLogError(@"Operation failed with error: %@", error);
     }];
+
+    //Forecast Table
+    RKObjectMapping *forecastMapping = [RKObjectMapping mappingForClass:[Weather class]];
+    [forecastMapping addAttributeMappingsFromDictionary:
+     @{@"dt": @"timeStamp",
+       @"weather": @"weatherInfo",
+       @"main.temp": @"temperature",
+     }];
     
-    [_weatherAPI forecastWeatherByCoordinate: newLocation.coordinate withCallback:^(NSError *error, NSDictionary *result) {
+    RKResponseDescriptor *forecastResponceDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:forecastMapping method:RKRequestMethodGET pathPattern:@"/data/2.5/:forecast" keyPath:@"list" statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+    NSString *pathForecast = [NSString stringWithFormat:@"/data/2.5/forecast?lat=%f&lon=%f", _lat , _lon];
+    [[RKObjectManager sharedManager] addResponseDescriptor:forecastResponceDescriptor];
         
-        if (error) {
-            NSLog(@"OpenWeatherApi error:");
-            return;
-        }
-        
-        _forecast = result[@"list"];
-        [self.forecastTableView reloadData];
-        [MBProgressHUD hideHUDForView:self.view animated:YES];
+    [[RKObjectManager sharedManager] getObject:[Weather new] path:pathForecast parameters:nil success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
+        _forecast = [NSArray arrayWithArray:mappingResult.array];
+        [self.forecastTableView reloadData];        
         [_locationManager stopUpdatingLocation];
         
-            
+    } failure:^(RKObjectRequestOperation *operation, NSError *error) {
+        RKLogError(@"Operation failed with error: %@", error);
     }];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+
 }
 
 #pragma mark - tableview datasource
@@ -227,16 +248,24 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"];
     }
     
-    NSDictionary *forecastData = [_forecast objectAtIndex:indexPath.row];
-    cell.textLabel.text = [NSString stringWithFormat:@"%.1f℃ - %@",
-                           [forecastData[@"main"][@"temp"] floatValue],
-                           forecastData[@"weather"][0][@"main"]
-                           ];
+    Weather *weather = [_forecast objectAtIndex:indexPath.row];
+    cell.textLabel.text = [self stringTemperature:weather.temperature];
     
-    cell.detailTextLabel.text = [_dateFormatter stringFromDate:forecastData[@"dt"]];
+    cell.detailTextLabel.text = [_dateFormatter stringFromDate:weather.timeStamp];
     
     return cell;
     
+}
+
+-(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return @"Forecast";
+}
+
+- (NSString *) stringTemperature: (NSNumber *) temperature
+{
+    float temp = [temperature floatValue] - 273.15;
+    return [NSString stringWithFormat:@"%.1fºC", temp];
 }
 
 
