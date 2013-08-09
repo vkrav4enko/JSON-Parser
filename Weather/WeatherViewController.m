@@ -10,7 +10,6 @@
 #import "MMDrawerBarButtonItem.h"
 #import "MMDrawerController.h"
 #import "UIViewController+MMDrawerController.h"
-#import "OWMWeatherAPI.h"
 #import "AppDelegate.h"
 #import "WeatherInfo.h"
 #import "NSManagedObject+ActiveRecord.h"
@@ -21,7 +20,6 @@
 
 @property (nonatomic, strong) NSArray *forecast;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
-@property (nonatomic, strong) OWMWeatherAPI *weatherAPI;
 @property (nonatomic, strong) NSDictionary *result;
 @property (nonatomic) float lat;
 @property (nonatomic) float lon;
@@ -43,25 +41,18 @@
 {
     [super viewDidLoad];
     MMDrawerBarButtonItem * leftDrawerButton = [[MMDrawerBarButtonItem alloc] initWithTarget:self action:@selector(leftDrawerButtonPress:)];
-    [self.navigationItem setLeftBarButtonItem:leftDrawerButton animated:YES];
-	
+    [self.navigationItem setLeftBarButtonItem:leftDrawerButton animated:YES];	
     
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    // Setup weather api
-    
     _dateFormatter = [[NSDateFormatter alloc] init];
     [_dateFormatter setDateFormat:@"MMMM dd HH:mm"];
-    _forecast = @[];
-    _weatherAPI = [[OWMWeatherAPI alloc] initWithAPIKey:@"Weather"];
+    _forecast = @[];    
+    self.title = @"Weather";    
     
-    self.title = @"Weather";
-    
-    
-    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];   
     
     _locationManager = [CLLocationManager new];
     _locationManager.delegate = self;
@@ -80,38 +71,19 @@
     
     if (![_cityName.text isEqualToString:@""])
     {
-        self.title = _cityName.text;
-        [_weatherAPI currentWeatherByCityName:_cityName.text withCallback:^(NSError *error, NSDictionary *result) {
-            if (error) {
-                NSLog(@"OpenWeatherApi error:");
-                return;
+        CLGeocoder* gc = [[CLGeocoder alloc] init];
+        [gc geocodeAddressString:_cityName.text completionHandler:^(NSArray *placemarks, NSError *error)
+        {
+            if ([placemarks count]>0)
+            {
+                // get the first one
+                CLPlacemark* mark = (CLPlacemark*)[placemarks objectAtIndex:0];
+                _lat = mark.location.coordinate.latitude;
+                _lon = mark.location.coordinate.longitude;
+                [self showWeather];
             }
-            self.cityName.text = [NSString stringWithFormat:@"%@, %@",
-                                  result[@"name"],
-                                  result[@"sys"][@"country"]
-                                  ];
-            self.title = _cityName.text;            
-            self.currentTemp.text = [NSString stringWithFormat:@"%.1f℃",
-                                     [result[@"main"][@"temp"] floatValue] ];
-            
-            self.currentTimestamp.text =  [_dateFormatter stringFromDate:result[@"dt"]];
-            
-            self.weather.text = result[@"weather"][0][@"description"];
-            
         }];
-        [_weatherAPI forecastWeatherByCityName:_cityName.text withCallback:^(NSError *error, NSDictionary *result) {
-            
-            if (error) {
-                NSLog(@"OpenWeatherApi error:");
-                return;
-            }
-            
-            _forecast = result[@"list"];
-            [self.forecastTableView reloadData];
-            [MBProgressHUD hideHUDForView:self.view animated:YES];
-            [_locationManager stopUpdatingLocation];
-            
-        }];
+        
         appDelegate.cityName = @"";
     }
     else
@@ -119,6 +91,50 @@
         [_locationManager startUpdatingLocation];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Details" style:UIBarButtonItemStyleBordered target:self action:@selector(showDetail:)];
     }
+}
+
+- (void) showWeather
+{
+    //Current weather
+    [[RKObjectManager sharedManager] getObject:[Weather new]
+                                          path:@"/data/2.5/weather"
+                                    parameters:@{@"lat": @(_lat), @"lon": @(_lon) }
+                                       success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
+     {
+         if (mappingResult.array.count)
+         {
+             Weather *weather = mappingResult.array [0];
+             self.cityName.text = weather.city;
+             self.navigationItem.prompt = _cityName.text;
+             
+             self.currentTemp.text = [self stringTemperature:weather.temperature];
+             
+             self.currentTimestamp.text =  [_dateFormatter stringFromDate:weather.timeStamp];
+             
+             self.weather.text = [[weather.weatherInfo objectAtIndex:0] objectForKey:@"description"];
+         }
+         
+     }
+                                       failure:^(RKObjectRequestOperation *operation, NSError *error)
+     {
+         RKLogError(@"Operation failed with error: %@", error);
+     }];
+    
+    //Forecast
+    [[RKObjectManager sharedManager] getObjectsAtPathForRouteNamed:@"forecasts"
+                                                            object:nil
+                                                        parameters:@{@"lat": @(_lat), @"lon": @(_lon) } success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
+     {
+         _forecast = [NSArray arrayWithArray:mappingResult.array];
+         [self.forecastTableView reloadData];
+         [_locationManager stopUpdatingLocation];
+     }
+                                                           failure:^(RKObjectRequestOperation *operation, NSError *error)
+     {
+         RKLogError(@"Operation failed with error: %@", error);
+     }];
+    
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
 }
 
 - (void) showDetail: (id) sender{
@@ -169,48 +185,14 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
-    _lat = newLocation.coordinate.latitude;
-    _lon = newLocation.coordinate.longitude;    
-    
-    [[RKObjectManager sharedManager] getObject:[Weather new]
-                                          path:@"/data/2.5/weather"
-                                    parameters:@{@"lat": @(_lat), @"lon": @(_lon) }
-                                       success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
+    if (!_lat)
     {
-        if (mappingResult.array.count)
-        {
-            Weather *weather = mappingResult.array [0];
-            self.cityName.text = weather.city;
-            self.navigationItem.prompt = _cityName.text;
-            
-            self.currentTemp.text = [self stringTemperature:weather.temperature];
-            
-            self.currentTimestamp.text =  [_dateFormatter stringFromDate:weather.timeStamp];
-            
-            self.weather.text = [[weather.weatherInfo objectAtIndex:0] objectForKey:@"description"];
-        }        
-        
+        _lat = newLocation.coordinate.latitude;
+        _lon = newLocation.coordinate.longitude;    
+        [self showWeather];
     }
-                                       failure:^(RKObjectRequestOperation *operation, NSError *error)
-    {
-        RKLogError(@"Operation failed with error: %@", error);
-    }];
-
-
-    [[RKObjectManager sharedManager] getObjectsAtPathForRouteNamed:@"forecasts"
-                                                            object:nil
-                                                        parameters:@{@"lat": @(_lat), @"lon": @(_lon) } success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
-    {
-        _forecast = [NSArray arrayWithArray:mappingResult.array];
-        [self.forecastTableView reloadData];
+    else
         [_locationManager stopUpdatingLocation];
-    }
-                                                           failure:^(RKObjectRequestOperation *operation, NSError *error)
-    {
-        RKLogError(@"Operation failed with error: %@", error);
-    }];    
-
-    [MBProgressHUD hideHUDForView:self.view animated:YES];
 
 }
 

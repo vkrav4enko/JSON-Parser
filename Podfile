@@ -1,6 +1,5 @@
 platform:ios, '6.0'
 pod 'MBProgressHUD', '~> 0.7'
 pod 'MMDrawerController', '~> 0.2.1'
-pod 'OpenWeatherMapAPI', '~> 0.0.5'
 pod 'CorePlot'
 pod 'RestKit', '~> 0.20.0rc'

@@ -21,7 +21,7 @@
     AppDelegate *appDelegat = (AppDelegate *) [UIApplication sharedApplication].delegate;
     UINavigationController * navigationController = [[UINavigationController alloc] initWithRootViewController:[self destinationViewController]];
     _drawerController = appDelegat.drawerController;
-    [_drawerController setCenterViewController:navigationController withCloseAnimation:YES completion:nil];
+    [_drawerController setCenterViewController:navigationController withCloseAnimation:YES completion:nil];    
     
 }
 

@@ -10,7 +10,7 @@
 #define COCOAPODS_POD_AVAILABLE_AFNetworking
 #define COCOAPODS_VERSION_MAJOR_AFNetworking 1
 #define COCOAPODS_VERSION_MINOR_AFNetworking 3
-#define COCOAPODS_VERSION_PATCH_AFNetworking 1
+#define COCOAPODS_VERSION_PATCH_AFNetworking 2
 
 // CorePlot
 #define COCOAPODS_POD_AVAILABLE_CorePlot
@@ -47,12 +47,6 @@
 #define COCOAPODS_VERSION_MAJOR_MMDrawerController_MMDrawerVisualStates 0
 #define COCOAPODS_VERSION_MINOR_MMDrawerController_MMDrawerVisualStates 2
 #define COCOAPODS_VERSION_PATCH_MMDrawerController_MMDrawerVisualStates 1
-
-// OpenWeatherMapAPI
-#define COCOAPODS_POD_AVAILABLE_OpenWeatherMapAPI
-#define COCOAPODS_VERSION_MAJOR_OpenWeatherMapAPI 0
-#define COCOAPODS_VERSION_MINOR_OpenWeatherMapAPI 0
-#define COCOAPODS_VERSION_PATCH_OpenWeatherMapAPI 5
 
 // RestKit
 #define COCOAPODS_POD_AVAILABLE_RestKit
