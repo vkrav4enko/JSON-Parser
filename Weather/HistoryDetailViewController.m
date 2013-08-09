@@ -47,19 +47,14 @@ CGFloat const CPDBarInitialX = 0.5f;
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
-    
+    [super viewDidLoad];    
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
-    HistoryViewController *masterController = [self.navigationController.viewControllers objectAtIndex:0];
-    _weatherInfo = masterController.weatherInfo;
-    NSManagedObjectContext *context = appDelegate.managedObjectContext;
-    NSString *filter = [NSString stringWithFormat:@"city like \"%@\"", _weatherInfo.city];
-    _arrayWithEntities = [WeatherInfo findAllSortedBy:@"timeStamp" ascending:YES withPredicate:[NSPredicate predicateWithFormat:filter] inContext:context];
-    NSLog (@"%@",_arrayWithEntities);
+    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;    
+    NSManagedObjectContext *context = appDelegate.managedObjectContext;    
+    _arrayWithEntities = [WeatherInfo findAllSortedBy:@"timeStamp" ascending:YES withPredicate:nil inContext:context];   
     [self initPlot];
     
 }

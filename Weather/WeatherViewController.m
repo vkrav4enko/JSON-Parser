@@ -20,7 +20,6 @@
 
 @property (nonatomic, strong) NSArray *forecast;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
-@property (nonatomic, strong) NSDictionary *result;
 @property (nonatomic) float lat;
 @property (nonatomic) float lon;
 
@@ -41,8 +40,7 @@
 {
     [super viewDidLoad];
     MMDrawerBarButtonItem * leftDrawerButton = [[MMDrawerBarButtonItem alloc] initWithTarget:self action:@selector(leftDrawerButtonPress:)];
-    [self.navigationItem setLeftBarButtonItem:leftDrawerButton animated:YES];	
-    
+    [self.navigationItem setLeftBarButtonItem:leftDrawerButton animated:YES];    
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -50,10 +48,14 @@
     _dateFormatter = [[NSDateFormatter alloc] init];
     [_dateFormatter setDateFormat:@"MMMM dd HH:mm"];
     _forecast = @[];    
-    self.title = @"Weather";    
+    self.title = @"Weather";     
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     
-    [MBProgressHUD showHUDAddedTo:self.view animated:YES];   
-    
+    [self configureLocation];
+}
+
+- (void) configureLocation
+{
     _locationManager = [CLLocationManager new];
     _locationManager.delegate = self;
     if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined) {
@@ -63,7 +65,7 @@
                                        userInfo:nil
                                         repeats:YES];
         
-    }   
+    }
     
     AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
     _cityName.text = appDelegate.cityName;
@@ -73,16 +75,16 @@
     {
         CLGeocoder* gc = [[CLGeocoder alloc] init];
         [gc geocodeAddressString:_cityName.text completionHandler:^(NSArray *placemarks, NSError *error)
-        {
-            if ([placemarks count]>0)
-            {
-                // get the first one
-                CLPlacemark* mark = (CLPlacemark*)[placemarks objectAtIndex:0];
-                _lat = mark.location.coordinate.latitude;
-                _lon = mark.location.coordinate.longitude;
-                [self showWeather];
-            }
-        }];
+         {
+             if ([placemarks count]>0)
+             {
+                 // get the first one
+                 CLPlacemark* mark = (CLPlacemark*)[placemarks objectAtIndex:0];
+                 _lat = mark.location.coordinate.latitude;
+                 _lon = mark.location.coordinate.longitude;
+                 [self showWeather];
+             }
+         }];
         
         appDelegate.cityName = @"";
     }
@@ -105,12 +107,9 @@
          {
              Weather *weather = mappingResult.array [0];
              self.cityName.text = weather.city;
-             self.navigationItem.prompt = _cityName.text;
-             
-             self.currentTemp.text = [self stringTemperature:weather.temperature];
-             
-             self.currentTimestamp.text =  [_dateFormatter stringFromDate:weather.timeStamp];
-             
+             self.navigationItem.prompt = _cityName.text;             
+             self.currentTemp.text = [self stringTemperature:weather.temperature];             
+             self.currentTimestamp.text =  [_dateFormatter stringFromDate:weather.timeStamp];             
              self.weather.text = [[weather.weatherInfo objectAtIndex:0] objectForKey:@"description"];
          }
          

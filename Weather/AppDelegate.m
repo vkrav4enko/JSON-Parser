@@ -13,20 +13,13 @@
 
 
 @implementation AppDelegate
-@synthesize managedObjectContext = _managedObjectContext;
-@synthesize managedObjectModel = _managedObjectModel;
-@synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
-
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     NSError *error = nil;
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Weather" withExtension:@"momd"];
-    NSManagedObjectModel *managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+    NSManagedObjectModel *managedObjectModel = [NSManagedObjectModel mergedModelFromBundles:nil];
     RKManagedObjectStore *managedObjectStore = [[RKManagedObjectStore alloc] initWithManagedObjectModel:managedObjectModel];
-
-
-        
+    
     NSString *path = [RKApplicationDataDirectory() stringByAppendingPathComponent:@"Weather.sqlite"];
     NSPersistentStore *persistentStore = [managedObjectStore addSQLitePersistentStoreAtPath:path fromSeedDatabaseAtPath:nil withConfiguration:nil options:nil error:&error];
     if (! persistentStore) {
@@ -35,37 +28,12 @@
     [managedObjectStore createManagedObjectContexts];
     [RKManagedObjectStore setDefaultStore:managedObjectStore];
     _managedObjectContext = [[RKManagedObjectStore defaultStore] mainQueueManagedObjectContext];
-    NSURL *baseURL = [NSURL URLWithString:@"http://api.openweathermap.org"];
-    RKObjectManager *objectManager = [RKObjectManager managerWithBaseURL:baseURL];
-    objectManager.managedObjectStore = managedObjectStore;
     
-    //Forecast mapping
-    RKObjectMapping *forecastMapping = [RKObjectMapping mappingForClass:[Weather class]];
-    [forecastMapping addAttributeMappingsFromDictionary:
-     @{@"dt": @"timeStamp",
-     @"weather": @"weatherInfo",
-     @"main.temp": @"temperature",
-     }];    
-    RKResponseDescriptor *forecastResponceDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:forecastMapping method:RKRequestMethodGET pathPattern:@"/data/2.5/forecast" keyPath:@"list" statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-    [[RKObjectManager sharedManager] addResponseDescriptor:forecastResponceDescriptor];    
-    RKRoute *route = [RKRoute routeWithName:@"forecasts" pathPattern:@"/data/2.5/forecast" method:RKRequestMethodGET];
-    [[[RKObjectManager sharedManager].router routeSet] addRoute:route];
-    
-       
-    //Current Weather mapping
-    RKObjectMapping *weatherMapping = [RKObjectMapping mappingForClass:[Weather class]];
-    [weatherMapping addAttributeMappingsFromDictionary:
-     @{@"dt": @"timeStamp",
-     @"main.temp": @"temperature",
-     @"weather": @"weatherInfo",
-     @"name": @"city"
-     }];
-    RKResponseDescriptor *weatherResponseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:weatherMapping method:RKRequestMethodGET pathPattern:@"/data/2.5/weather" keyPath:nil statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-    [[RKObjectManager sharedManager] addResponseDescriptor:weatherResponseDescriptor];
-    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
-    UIViewController * leftSideDrawerViewController = [storyboard instantiateViewControllerWithIdentifier:@"Menu"];
+    [self configureObjectManager];
     
     //Menu controller
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
+    UIViewController * leftSideDrawerViewController = [storyboard instantiateViewControllerWithIdentifier:@"Menu"];
     _drawerController = [[MMDrawerController alloc]
                                              initWithCenterViewController:[storyboard instantiateInitialViewController]
                                              leftDrawerViewController:leftSideDrawerViewController];
@@ -76,12 +44,41 @@
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     
-//    _drawerController.centerViewController = [storyboard instantiateInitialViewController];
-
-        
     return YES;
 }
-							
+
+- (void) configureObjectManager
+{
+    NSURL *baseURL = [NSURL URLWithString:@"http://api.openweathermap.org"];
+    RKObjectManager *objectManager = [RKObjectManager managerWithBaseURL:baseURL];
+    objectManager.managedObjectStore = [RKManagedObjectStore defaultStore];
+    
+    //Forecast mapping
+    RKObjectMapping *forecastMapping = [RKObjectMapping mappingForClass:[Weather class]];
+    [forecastMapping addAttributeMappingsFromDictionary:
+     @{@"dt": @"timeStamp",
+     @"weather": @"weatherInfo",
+     @"main.temp": @"temperature",
+     }];
+    RKResponseDescriptor *forecastResponceDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:forecastMapping method:RKRequestMethodGET pathPattern:@"/data/2.5/forecast" keyPath:@"list" statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+    [[RKObjectManager sharedManager] addResponseDescriptor:forecastResponceDescriptor];
+    RKRoute *route = [RKRoute routeWithName:@"forecasts" pathPattern:@"/data/2.5/forecast" method:RKRequestMethodGET];
+    [[[RKObjectManager sharedManager].router routeSet] addRoute:route];
+    
+    
+    //Current Weather mapping
+    RKObjectMapping *weatherMapping = [RKObjectMapping mappingForClass:[Weather class]];
+    [weatherMapping addAttributeMappingsFromDictionary:
+     @{@"dt": @"timeStamp",
+     @"main.temp": @"temperature",
+     @"weather": @"weatherInfo",
+     @"name": @"city"
+     }];
+    RKResponseDescriptor *weatherResponseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:weatherMapping method:RKRequestMethodGET pathPattern:@"/data/2.5/weather" keyPath:nil statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+    [[RKObjectManager sharedManager] addResponseDescriptor:weatherResponseDescriptor];
+
+}
+
 - (void)applicationWillResignActive:(UIApplication *)application
 {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.

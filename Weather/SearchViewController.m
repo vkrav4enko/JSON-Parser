@@ -21,6 +21,7 @@
 @interface SearchViewController () <UIAlertViewDelegate>
 
 @property (nonatomic, strong) NSTimer *timer;
+@property (nonatomic) BOOL hadLocation;
 - (BOOL) findWithCityName: (NSString *) city;
 
 @end
@@ -31,43 +32,20 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    self.title = @"Weather map";
-    
+    self.title = @"Weather map";    
     
     _locationManager = [CLLocationManager new];
-    _locationManager.delegate = self;
-    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined) {
-        
-        [NSTimer scheduledTimerWithTimeInterval:2 target:self
-                                       selector:@selector(timerFired:)
-                                       userInfo:nil
-                                        repeats:YES];
-        
-    }
+    _locationManager.delegate = self;    
     [self showCurrentLocation:nil];
     _mapView.showsUserLocation = NO;
     MMDrawerBarButtonItem * leftDrawerButton = [[MMDrawerBarButtonItem alloc] initWithTarget:self action:@selector(leftDrawerButtonPress:)];
     [self.navigationItem setLeftBarButtonItem:leftDrawerButton animated:YES]; 
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Home" style:UIBarButtonItemStyleBordered target:self action:@selector(showCurrentLocation:)];
-           
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Home" style:UIBarButtonItemStyleBordered target:self action:@selector(showCurrentLocation:)];           
     _textField.returnKeyType = UIReturnKeySearch;
-    
-    
-//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Show" style:UIBarButtonItemStyleBordered target:self action:@selector(showWeather:)];
 }
 
 -(void)leftDrawerButtonPress:(id)sender{
     [self.mm_drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
-}
-
-- (void)timerFired:(NSTimer*)theTimer{
-    
-    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorized) {
-        [self showCurrentLocation:nil];
-        [theTimer invalidate];
-    }
-    [_locationManager startUpdatingLocation];
-    
 }
 
 - (void)didReceiveMemoryWarning
@@ -78,49 +56,43 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
-    [_mapView removeAnnotations:_mapView.annotations];      
-    NSString *strURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f", newLocation.coordinate.latitude, newLocation.coordinate.longitude];
-    
-    NSString *weather  = [NSString stringWithContentsOfURL:[NSURL URLWithString:strURL] encoding:NSUTF8StringEncoding error:nil];
-    
-    ParseJSON *parser = [[ParseJSON alloc] initWithString:weather];
-    id obj = [parser parse];
-    _parsedDictionary  = obj;
-    
-    
-    Annotation *annotation = [Annotation new];
-    annotation.title = @"Current location";
-    NSNumber *temperature = [[obj objectForKey:@"main"] objectForKey:@"temp"];    
-    annotation.subtitle = [NSString stringWithFormat:@"temperature = %.0f ºC", [temperature floatValue] - 273.15f];
-    annotation.coordinate = CLLocationCoordinate2DMake(newLocation.coordinate.latitude, newLocation.coordinate.longitude);
-    
-    MKCoordinateRegion region = self.mapView.region;
-    region.center = CLLocationCoordinate2DMake(newLocation.coordinate.latitude, newLocation.coordinate.longitude);
-    region.span.longitudeDelta = 10.0f;
-    region.span.latitudeDelta = 15.0f;
-    [self.mapView setRegion:region animated:YES];
-    
-    [_mapView addAnnotation:annotation];
-    [self openAnnotation:annotation];
-    if (annotation)
-    [_locationManager stopUpdatingLocation];
-    
+    if (!_hadLocation)
+    {
+        _hadLocation = YES;
+        [_mapView removeAnnotations:_mapView.annotations];
+        NSString *strURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f", newLocation.coordinate.latitude, newLocation.coordinate.longitude];        
+        NSString *weather  = [NSString stringWithContentsOfURL:[NSURL URLWithString:strURL] encoding:NSUTF8StringEncoding error:nil];        
+        ParseJSON *parser = [[ParseJSON alloc] initWithString:weather];
+        id obj = [parser parse];
+        _parsedDictionary  = obj;
+        Annotation *annotation = [Annotation new];
+        annotation.title = @"Current location";
+        NSNumber *temperature = [[obj objectForKey:@"main"] objectForKey:@"temp"];    
+        annotation.subtitle = [NSString stringWithFormat:@"temperature = %.0f ºC", [temperature floatValue] - 273.15f];
+        annotation.coordinate = CLLocationCoordinate2DMake(newLocation.coordinate.latitude, newLocation.coordinate.longitude);        
+        MKCoordinateRegion region = self.mapView.region;
+        region.center = CLLocationCoordinate2DMake(newLocation.coordinate.latitude, newLocation.coordinate.longitude);
+        region.span.longitudeDelta = 10.0f;
+        region.span.latitudeDelta = 15.0f;
+        [self.mapView setRegion:region animated:YES];        
+        [_mapView addAnnotation:annotation];
+        [self openAnnotation:annotation];           
+    }
+    else
+        [_locationManager stopUpdatingLocation];
 
 }
 
 - (void)showCurrentLocation:(UIButton*)sender {
-    
+    _hadLocation = NO;
     [_locationManager startUpdatingLocation];
     //[_locationManager performSelector:@selector(stopUpdatingLocation) withObject:nil afterDelay:1.0f];
     [self.view endEditing:YES];
 }
 
-
-
 - (void)openAnnotation:(id)annotation;
 {
-    [_mapView selectAnnotation:annotation animated:YES];
-    
+    [_mapView selectAnnotation:annotation animated:YES];    
 }
 
 - (BOOL) findWithCityName: (NSString *) city
@@ -129,37 +101,24 @@
         [_mapView removeAnnotations:_mapView.annotations];
         Annotation *annotation = [Annotation new];
         annotation.title = city;
-        
-        
-        NSString *cityName = [NSString stringWithString:city];
-        NSString *strURL = [NSString stringWithFormat:@"http://maps.google.com/maps/api/geocode/json?address=%@&sensor=true", cityName];
+        NSString *strURL = [NSString stringWithFormat:@"http://maps.google.com/maps/api/geocode/json?address=%@&sensor=true", city];
         NSString *geocode  = [NSString stringWithContentsOfURL:[NSURL URLWithString:strURL] encoding:NSUTF8StringEncoding error:nil];
         ParseJSON *parcer = [[ParseJSON alloc] initWithString:geocode];
-        id obj = [parcer parse];
-        
-        
+        id obj = [parcer parse];       
         NSNumber *number = [[[[[obj objectForKey: @"results"] objectAtIndex:0] objectForKey:@"geometry"] objectForKey:@"location"] objectForKey:@"lat"] ;
         float lat = [number floatValue];
         number = [[[[[obj objectForKey: @"results"] objectAtIndex:0] objectForKey:@"geometry"] objectForKey:@"location"] objectForKey:@"lng"] ;
-        float lng = [number floatValue];
-        
-        strURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f", lat, lng];
-        
-        NSString *weather  = [NSString stringWithContentsOfURL:[NSURL URLWithString:strURL] encoding:NSUTF8StringEncoding error:nil];
-        
+        float lng = [number floatValue];        
+        strURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f", lat, lng];        
+        NSString *weather  = [NSString stringWithContentsOfURL:[NSURL URLWithString:strURL] encoding:NSUTF8StringEncoding error:nil];        
         ParseJSON *parser2 = [[ParseJSON alloc] initWithString:weather];
         id obj2 = [parser2 parse];
-        _parsedDictionary  = obj2;
-        
-        NSNumber *temperature = [[obj2 objectForKey:@"main"] objectForKey:@"temp"];
-        
+        _parsedDictionary  = obj2;        
+        NSNumber *temperature = [[obj2 objectForKey:@"main"] objectForKey:@"temp"];        
         annotation.subtitle = [NSString stringWithFormat:@"temperature = %.0f ºC", [temperature floatValue] - 273.15f];
         
-        NSLog(@"lat = %f, lng = %f", lat, lng);
-        
         annotation.coordinate = CLLocationCoordinate2DMake(lat, lng);
-        [_mapView addAnnotation:annotation];
-        
+        [_mapView addAnnotation:annotation];        
         MKCoordinateRegion region = self.mapView.region;
         region.center = CLLocationCoordinate2DMake(lat, lng);
         region.span.longitudeDelta = 10.0f;
@@ -247,8 +206,7 @@
 {
     Annotation *annotationTapped = (Annotation *)view.annotation;
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
-    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
-    
+    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;    
     
     if (![annotationTapped.title isEqualToString:@"Current location"])
     {
