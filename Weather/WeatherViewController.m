@@ -137,17 +137,8 @@
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString: stringURL]];
     RKManagedObjectRequestOperation *managedObjectRequestOperation = [[RKManagedObjectRequestOperation alloc] initWithRequest:request responseDescriptors:@[ responseDescriptor ]];
     managedObjectRequestOperation.managedObjectContext = [[RKManagedObjectStore defaultStore] mainQueueManagedObjectContext];
-    [[NSOperationQueue currentQueue] addOperation:managedObjectRequestOperation];
-    
-//    [[RKObjectManager sharedManager] addResponseDescriptor:responseDescriptor];
-//    RKRoute *coreDataRoute = [RKRoute routeWithName:@"coreData" pathPattern:@"/data/2.5/weather" method:RKRequestMethodGET];
-//    [[[RKObjectManager sharedManager].router routeSet] addRoute:coreDataRoute];
-//    
-//    [[RKObjectManager sharedManager] getObjectsAtPathForRouteNamed:@"coreData"
-//                                                            object:nil
-//                                                        parameters:@{@"lat": @(_lat), @"lon": @(_lon)}
-//                                                           success:nil
-//                                                           failure:nil];    
+    [[NSOperationQueue currentQueue] addOperation:managedObjectRequestOperation];  
+   
     
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
     UINavigationController * navigationController = [[UINavigationController alloc] initWithRootViewController:[storyboard instantiateViewControllerWithIdentifier:@"History"]];
