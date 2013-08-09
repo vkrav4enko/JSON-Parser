@@ -123,8 +123,7 @@
 
 - (void) showDetail: (id) sender{
     
-    RKManagedObjectStore *managedObjectStore = [RKManagedObjectStore defaultStore];
-    RKEntityMapping *entityMapping = [RKEntityMapping mappingForEntityForName:@"WeatherInfo" inManagedObjectStore:managedObjectStore];
+    RKEntityMapping *entityMapping = [RKEntityMapping mappingForEntityForName:@"WeatherInfo" inManagedObjectStore:[RKManagedObjectStore defaultStore]];
     [entityMapping addAttributeMappingsFromDictionary:@{
      @"name":          @"city",
      @"clouds.all":    @"clouds",
@@ -133,28 +132,26 @@
      @"main.temp":     @"temperature",
      @"main.pressure": @"pressure",
      @"dt":            @"timeStamp"}];
-     
+    RKResponseDescriptor *responseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:entityMapping method:RKRequestMethodGET pathPattern:@"/data/2.5/weather" keyPath:nil statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+    NSString *stringURL = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f", _lat , _lon];
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString: stringURL]];
+    RKManagedObjectRequestOperation *managedObjectRequestOperation = [[RKManagedObjectRequestOperation alloc] initWithRequest:request responseDescriptors:@[ responseDescriptor ]];
+    managedObjectRequestOperation.managedObjectContext = [[RKManagedObjectStore defaultStore] mainQueueManagedObjectContext];
+    [[NSOperationQueue currentQueue] addOperation:managedObjectRequestOperation];
     
-    RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
-    RKResponseDescriptor *responseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:entityMapping method:RKRequestMethodGET pathPattern:@"/data/2.5/:weather" keyPath:nil statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];    
-    [[RKObjectManager sharedManager] addResponseDescriptor:responseDescriptor];
-    NSString *path = [NSString stringWithFormat:@"/data/2.5/weather?lat=%f&lon=%f", _lat , _lon];
-    [[RKObjectManager sharedManager] getObjectsAtPath:path parameters:nil success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {        
-        
-    } failure:^(RKObjectRequestOperation *operation, NSError *error) {
-        
-    }];
-    
-    
-    
-    
+//    [[RKObjectManager sharedManager] addResponseDescriptor:responseDescriptor];
+//    RKRoute *coreDataRoute = [RKRoute routeWithName:@"coreData" pathPattern:@"/data/2.5/weather" method:RKRequestMethodGET];
+//    [[[RKObjectManager sharedManager].router routeSet] addRoute:coreDataRoute];
+//    
+//    [[RKObjectManager sharedManager] getObjectsAtPathForRouteNamed:@"coreData"
+//                                                            object:nil
+//                                                        parameters:@{@"lat": @(_lat), @"lon": @(_lon)}
+//                                                           success:nil
+//                                                           failure:nil];    
     
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
     UINavigationController * navigationController = [[UINavigationController alloc] initWithRootViewController:[storyboard instantiateViewControllerWithIdentifier:@"History"]];
     [self.mm_drawerController setCenterViewController:navigationController withCloseAnimation:YES completion:nil];
-    
-   
-    
     
 }
 
@@ -182,55 +179,46 @@
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
     _lat = newLocation.coordinate.latitude;
-    _lon = newLocation.coordinate.longitude;
+    _lon = newLocation.coordinate.longitude;    
     
-    //Current Weather
-    RKObjectMapping *weatherMapping = [RKObjectMapping mappingForClass:[Weather class]];
-    [weatherMapping addAttributeMappingsFromDictionary:
-     @{@"dt": @"timeStamp",
-     @"main.temp": @"temperature",
-     @"weather": @"weatherInfo",
-     @"name": @"city"
-     }];
-    RKResponseDescriptor *weatherResponseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:weatherMapping method:RKRequestMethodGET pathPattern:@"/data/2.5/:weather" keyPath:nil statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-    [[RKObjectManager sharedManager] addResponseDescriptor:weatherResponseDescriptor];
-    NSString *pathWeather = [NSString stringWithFormat:@"/data/2.5/weather?lat=%f&lon=%f", _lat , _lon];
-    [[RKObjectManager sharedManager] getObject:[Weather new] path:pathWeather parameters:nil success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
+    [[RKObjectManager sharedManager] getObject:[Weather new]
+                                          path:@"/data/2.5/weather"
+                                    parameters:@{@"lat": @(_lat), @"lon": @(_lon) }
+                                       success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
+    {
+        if (mappingResult.array.count)
+        {
+            Weather *weather = mappingResult.array [0];
+            self.cityName.text = weather.city;
+            self.navigationItem.prompt = _cityName.text;
+            
+            self.currentTemp.text = [self stringTemperature:weather.temperature];
+            
+            self.currentTimestamp.text =  [_dateFormatter stringFromDate:weather.timeStamp];
+            
+            self.weather.text = [[weather.weatherInfo objectAtIndex:0] objectForKey:@"description"];
+        }        
         
-        Weather *weather = mappingResult.array [0];
-        self.cityName.text = weather.city;
-        self.navigationItem.prompt = _cityName.text;
-        
-        self.currentTemp.text = [self stringTemperature:weather.temperature];
-        
-        self.currentTimestamp.text =  [_dateFormatter stringFromDate:weather.timeStamp];
-        
-        self.weather.text = [[weather.weatherInfo objectAtIndex:0] objectForKey:@"description"];
-        
-    } failure:^(RKObjectRequestOperation *operation, NSError *error) {
+    }
+                                       failure:^(RKObjectRequestOperation *operation, NSError *error)
+    {
         RKLogError(@"Operation failed with error: %@", error);
     }];
 
-    //Forecast Table
-    RKObjectMapping *forecastMapping = [RKObjectMapping mappingForClass:[Weather class]];
-    [forecastMapping addAttributeMappingsFromDictionary:
-     @{@"dt": @"timeStamp",
-       @"weather": @"weatherInfo",
-       @"main.temp": @"temperature",
-     }];
-    
-    RKResponseDescriptor *forecastResponceDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:forecastMapping method:RKRequestMethodGET pathPattern:@"/data/2.5/:forecast" keyPath:@"list" statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-    NSString *pathForecast = [NSString stringWithFormat:@"/data/2.5/forecast?lat=%f&lon=%f", _lat , _lon];
-    [[RKObjectManager sharedManager] addResponseDescriptor:forecastResponceDescriptor];
-        
-    [[RKObjectManager sharedManager] getObject:[Weather new] path:pathForecast parameters:nil success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
+
+    [[RKObjectManager sharedManager] getObjectsAtPathForRouteNamed:@"forecasts"
+                                                            object:nil
+                                                        parameters:@{@"lat": @(_lat), @"lon": @(_lon) } success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
+    {
         _forecast = [NSArray arrayWithArray:mappingResult.array];
-        [self.forecastTableView reloadData];        
+        [self.forecastTableView reloadData];
         [_locationManager stopUpdatingLocation];
-        
-    } failure:^(RKObjectRequestOperation *operation, NSError *error) {
+    }
+                                                           failure:^(RKObjectRequestOperation *operation, NSError *error)
+    {
         RKLogError(@"Operation failed with error: %@", error);
-    }];
+    }];    
+
     [MBProgressHUD hideHUDForView:self.view animated:YES];
 
 }
@@ -249,7 +237,7 @@
     }
     
     Weather *weather = [_forecast objectAtIndex:indexPath.row];
-    cell.textLabel.text = [self stringTemperature:weather.temperature];
+    cell.textLabel.text = [[self stringTemperature:weather.temperature] stringByAppendingFormat:@" - %@", [[weather.weatherInfo objectAtIndex:0] objectForKey:@"main"]];
     
     cell.detailTextLabel.text = [_dateFormatter stringFromDate:weather.timeStamp];
     

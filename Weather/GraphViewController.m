@@ -208,7 +208,7 @@
             for (int i = 0; i < array.count; i++)
             {
                 _weatherInfo = [array objectAtIndex:i];
-                averageValue += [_weatherInfo.temperature floatValue];
+                averageValue += [_weatherInfo.temperature floatValue] - 273.15;
             }
             averageValue /= array.count;
             NSLog(@"%f", averageValue);
@@ -247,7 +247,7 @@
     
     
     // 5 - Create text layer for annotation
-    NSString *weatherInfo = [NSString stringWithFormat:@"Temperature = %.0fºC\n%@\n%@\n%@\n%@", temperature, _weatherInfo.pressure, _weatherInfo.clouds, _weatherInfo.wind, _weatherInfo.humidity];
+    NSString *weatherInfo = [NSString stringWithFormat:@"Temperature = %.0fºC\nPressure: %@ hPa\nClouds: %@%%\nWind: %@ mps\nHumidity: %@%%", temperature, _weatherInfo.pressure, _weatherInfo.clouds, _weatherInfo.wind, _weatherInfo.humidity];
     CPTTextLayer *textLayer = [[CPTTextLayer alloc] initWithText:weatherInfo style:style];
     self.weatherAnnotation.contentLayer = textLayer;
     // 6 - Get plot index based on identifier

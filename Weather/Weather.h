@@ -11,7 +11,6 @@
 @interface Weather : NSObject
 @property (nonatomic, copy) NSString *city;
 @property (nonatomic, strong) NSNumber *temperature;
-@property (nonatomic, copy) NSString *weatherDescription;
 @property (nonatomic, strong) NSDate *timeStamp;
 @property (nonatomic, strong) NSArray *weatherInfo;
 @end

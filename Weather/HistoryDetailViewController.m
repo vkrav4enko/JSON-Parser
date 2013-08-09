@@ -164,7 +164,7 @@ CGFloat const CPDBarInitialX = 0.5f;
     if ((fieldEnum == CPTBarPlotFieldBarTip) && (index < _arrayWithEntities.count)) {
         
         WeatherInfo *weather = [_arrayWithEntities objectAtIndex:index];
-        NSNumber *number = [NSNumber numberWithFloat: [weather.temperature floatValue]];
+        NSNumber *number = [NSNumber numberWithFloat: [weather.temperature floatValue]- 273.15];
         
         return number;
     }

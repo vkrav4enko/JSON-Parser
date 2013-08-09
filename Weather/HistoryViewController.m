@@ -255,12 +255,11 @@
     _weatherInfo = [_fetchedResultsController objectAtIndexPath:indexPath];
     HistoryDetailViewController *detailController = [self.navigationController.viewControllers objectAtIndex:1];
     detailController.city.text = [NSString stringWithFormat:@"City: %@", _weatherInfo.city];       
-    detailController.temp.text = [NSString stringWithFormat:@"Temperature = %@ºC", _weatherInfo.temperature] ;
-    detailController.cloud.text = _weatherInfo.clouds;
-    detailController.presure.text = _weatherInfo.pressure;
-    detailController.humidity.text = _weatherInfo.humidity;
-    detailController.wind.text = _weatherInfo.wind;
-    
+    detailController.temp.text = [NSString stringWithFormat:@"Temperature: %.1fºC", [_weatherInfo.temperature floatValue] - 273.15];
+    detailController.cloud.text =[NSString stringWithFormat:@"Clouds: %@%%", _weatherInfo.clouds];
+    detailController.presure.text =[NSString stringWithFormat:@"Preasure: %@ hPa", _weatherInfo.pressure];
+    detailController.humidity.text =[NSString stringWithFormat:@"Humidity: %@%%", _weatherInfo.humidity];
+    detailController.wind.text =[NSString stringWithFormat:@"Wind: %@ mps", _weatherInfo.wind];   
     
 }
 

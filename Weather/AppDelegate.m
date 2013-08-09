@@ -7,7 +7,8 @@
 //
 
 #import "AppDelegate.h"
-
+#import "Weather.h"
+#import "WeatherInfo.h"
 
 
 
@@ -23,10 +24,11 @@
     NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Weather" withExtension:@"momd"];
     NSManagedObjectModel *managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
     RKManagedObjectStore *managedObjectStore = [[RKManagedObjectStore alloc] initWithManagedObjectModel:managedObjectModel];
-    
-    NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"Weather.sqlite"];    
+
+
+        
     NSString *path = [RKApplicationDataDirectory() stringByAppendingPathComponent:@"Weather.sqlite"];
-    NSPersistentStore *persistentStore = [managedObjectStore addSQLitePersistentStoreAtPath:path fromSeedDatabaseAtPath:[storeURL absoluteString] withConfiguration:nil options:nil error:&error];
+    NSPersistentStore *persistentStore = [managedObjectStore addSQLitePersistentStoreAtPath:path fromSeedDatabaseAtPath:nil withConfiguration:nil options:nil error:&error];
     if (! persistentStore) {
         RKLogError(@"Failed adding persistent store at path '%@': %@", path, error);
     }
@@ -37,10 +39,33 @@
     RKObjectManager *objectManager = [RKObjectManager managerWithBaseURL:baseURL];
     objectManager.managedObjectStore = managedObjectStore;
     
+    //Forecast mapping
+    RKObjectMapping *forecastMapping = [RKObjectMapping mappingForClass:[Weather class]];
+    [forecastMapping addAttributeMappingsFromDictionary:
+     @{@"dt": @"timeStamp",
+     @"weather": @"weatherInfo",
+     @"main.temp": @"temperature",
+     }];    
+    RKResponseDescriptor *forecastResponceDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:forecastMapping method:RKRequestMethodGET pathPattern:@"/data/2.5/forecast" keyPath:@"list" statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+    [[RKObjectManager sharedManager] addResponseDescriptor:forecastResponceDescriptor];    
+    RKRoute *route = [RKRoute routeWithName:@"forecasts" pathPattern:@"/data/2.5/forecast" method:RKRequestMethodGET];
+    [[[RKObjectManager sharedManager].router routeSet] addRoute:route];
     
+       
+    //Current Weather mapping
+    RKObjectMapping *weatherMapping = [RKObjectMapping mappingForClass:[Weather class]];
+    [weatherMapping addAttributeMappingsFromDictionary:
+     @{@"dt": @"timeStamp",
+     @"main.temp": @"temperature",
+     @"weather": @"weatherInfo",
+     @"name": @"city"
+     }];
+    RKResponseDescriptor *weatherResponseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:weatherMapping method:RKRequestMethodGET pathPattern:@"/data/2.5/weather" keyPath:nil statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+    [[RKObjectManager sharedManager] addResponseDescriptor:weatherResponseDescriptor];
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
     UIViewController * leftSideDrawerViewController = [storyboard instantiateViewControllerWithIdentifier:@"Menu"];
     
+    //Menu controller
     _drawerController = [[MMDrawerController alloc]
                                              initWithCenterViewController:[storyboard instantiateInitialViewController]
                                              leftDrawerViewController:leftSideDrawerViewController];
@@ -51,7 +76,7 @@
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     
-    _drawerController.centerViewController = [storyboard instantiateInitialViewController];
+//    _drawerController.centerViewController = [storyboard instantiateInitialViewController];
 
         
     return YES;
